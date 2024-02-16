@@ -1,0 +1,20 @@
+{
+  "name": "dpa-ts-script",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@shopify/shopify-api": "^9.3.0",
+    "dotenv": "^16.4.4",
+    "ts-node": "^10.9.2"
+  }
+}
