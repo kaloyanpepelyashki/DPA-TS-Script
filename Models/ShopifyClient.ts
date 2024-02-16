@@ -35,7 +35,18 @@ class ShopifyClient {
             console.log(response);
             return response;
         } catch(e) {
-            console.log(e.message);
+            console.log(`Error finding collection: ${e.message}`);
+        }
+    }
+
+    public async getCollectionProducts() {
+        try{ 
+            const response = await this.shopify.rest.Collection.products({
+                session: this.session,
+                id: 608081805635
+            })
+        } catch(e) {
+            console.log(`Error getting products from collection: ${e.message}`);
         }
     }
 }
