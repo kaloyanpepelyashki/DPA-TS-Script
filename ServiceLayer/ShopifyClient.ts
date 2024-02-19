@@ -46,18 +46,13 @@ class ShopifyClient {
                 session: this.session,
                 id: collectionId
             })
+
+            return response;
         } catch(e) {
             console.log(`Error getting products from collection ${collectionId}: ${e.message}`);
         }
     }
 
-    public getClient() {
-        return this.shopify
-    }
-
-    public getSession() {
-        return this.session;
-    }
 }
 
 export default ShopifyClient;

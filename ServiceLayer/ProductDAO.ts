@@ -13,7 +13,8 @@ class ProductDAO extends ShopifyClient {
         try{
             const response = await this.shopify.rest.Product.all({
                 session: this.session,
-                collection_id: collectionId
+                collection_id: collectionId,
+             
             })
 
             return response;
