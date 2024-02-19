@@ -5,28 +5,17 @@ import OrdersDAO from "./ServiceLayer/OrdersDAO";
 
 
 const main = async () => {
-    // const shopifyClient = new ShopifyClient();
 
-    // const response = await shopifyClient.findCollection();
 
-    // console.log(response);
+    const ordersDao = OrdersDAO.getInstance();
 
-//     const productDAO: ProductsDAO = new ProductsDAO();
+     const orders = await ordersDao.getOrdersProductIDAfter("2023-03-30 12:00:00.000");
 
-//    console.log( await productDAO.getProductByCollectionId(608081805635));
-
-    const ordersDao = new OrdersDAO();
-    // const orders = await ordersDao.getOrdersOBJBefore("2023-03-30 12:00:00.000");
-
-    // orders.data.map((order) => {
-    //     order.line_items.forEach((lineItem) => {
-    //         console.log(lineItem.product_id)
-    //     })
-    // })
-
-    const productsIDs = await ordersDao.getOrdersProductIDBeofre("2023-03-30 12:00:00.000");
-
-    console.log(productsIDs)
+     orders.forEach((order) => {
+        console.log("Order: ")
+        order.products.forEach((product) => {
+            console.log(product)
+        })
+     })
 }
-
 main();

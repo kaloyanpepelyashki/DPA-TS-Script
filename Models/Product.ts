@@ -1,8 +1,14 @@
 /** This class represents the product object fetched from the Shopify database*/
 class Product {
     public productID: number;
-    constructor(product) {
-        this.productID = product.product_id;
+    public productWeight: number;
+    public productVariantId: number;
+    public productQuantity: number;
+    constructor(productId: number, productVariantId: number, productWeight: number, productQuantity: number) {
+        this.productID = productId;
+        this.productVariantId = productVariantId;
+        this.productWeight = productWeight;
+        this.productQuantity = productQuantity;
     }
 }
 
