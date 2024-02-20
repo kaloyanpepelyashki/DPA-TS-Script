@@ -22,35 +22,8 @@ class ShopifyClient {
             hostName: "ebits-dk.myshopify.com",
             // Mount REST resources.
             restResources,
-          });
+        });
         this.session= this.shopify.session.customAppSession("ebits-dk.myshopify.com");
-    }
-
-    public async findCollection() {
-        try{
-            const response = await this.shopify.rest.Collection.find({
-                session: this.session,
-                id: 608081805635
-            })
-        
-            console.log(response);
-            return response;
-        } catch(e) {
-            console.log(`Error finding collection: ${e.message}`);
-        }
-    }
-
-    public async getCollectionProducts(collectionId: number) {
-        try{ 
-            const response = await this.shopify.rest.Collection.products({
-                session: this.session,
-                id: collectionId
-            })
-
-            return response;
-        } catch(e) {
-            console.log(`Error getting products from collection ${collectionId}: ${e.message}`);
-        }
     }
 
 }
