@@ -50,16 +50,21 @@ class OrdersDAO extends ShopifyClient {
             if(response.data.length > 0) {
                 let ordersArray: Array<Order> = [];
                 response.data.forEach((order) => {
-                    const orderItem = new Order();
-                    order.line_items.forEach((lineItem) => {
-                        const product = new Product(lineItem.product_id, lineItem.variant_id, lineItem.grams, lineItem.quantity)
-                       orderItem.pushProduct(product);
-                    })
-                    ordersArray.push(orderItem);
+                    if(order.billing_address.country === "Denmark") {
+                        const orderItem = new Order();
+                        order.line_items.forEach((lineItem) => {
+                            const product = new Product(lineItem.product_id, lineItem.variant_id, lineItem.grams, lineItem.quantity)
+                        orderItem.pushProduct(product);
+                        })
+                        ordersArray.push(orderItem);
+                    } else {
+                        return
+                    }
                 })
 
                 
                 return ordersArray;
+                
             }
             return null;
         } catch(e) {
