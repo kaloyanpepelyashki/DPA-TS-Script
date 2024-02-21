@@ -1,26 +1,39 @@
 import CollectionsDAO from "../ServiceLayer/CollectionsDAO";
 
+/** This class is a blue print of a Map, that contains both a collection Id and the products belonging to it */
 class CollectionsMap {
     protected dpaCollectionsMap: Map<number, Array<number>> = new Map();
     protected dpaCollectionIds: Array<number> = [608081805635, 608081871171, 608081674563, 608081641795]
     protected collectionsDAO: CollectionsDAO = CollectionsDAO.getInstance();
     constructor() {}
 
-    public async initialize() {
-        await this.updateCollectionsMap();
+    public async initialize(): Promise<void | null> {
+        try{
+            const result = await this.updateCollectionsMap();
+            if(result === null) {
+                return null;
+            }
+        } catch(e) {
+            console.log(`Error initalising collections map: ${e.message}`);
+            return null;
+        }
     }
     
-    private async updateCollectionsMap() {
-        console.log("In updateCollectionsMap")
-        for(const collectionId of this.dpaCollectionIds) {
-            const collectionProducts = await this.collectionsDAO.getCollectionProducts(collectionId);
-            const productsArray: Array<number> = [];
+    private async updateCollectionsMap(): Promise<void | null> {
+        try{
+            for(const collectionId of this.dpaCollectionIds) {
+                const collectionProducts = await this.collectionsDAO.getCollectionProducts(collectionId);
+                const productsArray: Array<number> = [];
 
-            collectionProducts.products.forEach((product) => {
-                productsArray.push(product.id);
-            })
+                collectionProducts.products.forEach((product) => {
+                    productsArray.push(product.id);
+                })
 
-            this.dpaCollectionsMap.set(collectionId, productsArray);
+                this.dpaCollectionsMap.set(collectionId, productsArray);
+            } 
+        } catch(e) {
+            console.log(`Error composing collections map: ${e.message}`);
+            return null;
         }
     }
 

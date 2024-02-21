@@ -36,13 +36,14 @@ class OrdersDAO extends ShopifyClient {
             return response;
         } catch(e) {
             console.log(`Error retreiving orders: ${e}`)
+            return null;
         }
     }
-    /** This method returns an array of product's ID's that fit the condition of being ordered after the specific date
+    /** This method returns an array of order objects, containing an array of objects, representing each order's product that fit the condition of being ordered after the specific date
      * @param {string} date  (ISO 8601)
-     * @param limmit number (the limit of products shown)
+     * @param {number} limit number (the limit of products shown)
      */
-    public async getOrdersProductIDAfter(date: string, limit?: number) {
+    public async getOrdersAfter(date: string, limit?: number): Promise<Array<Order> | null> {
         try{
             const response = await this.getOrdersOBJAfter(date, limit);
 
@@ -50,7 +51,7 @@ class OrdersDAO extends ShopifyClient {
                 let ordersArray: Array<Order> = [];
                 response.data.forEach((order) => {
                     const orderItem = new Order();
-                    order.line_items.forEach(async (lineItem) => {
+                    order.line_items.forEach((lineItem) => {
                         const product = new Product(lineItem.product_id, lineItem.variant_id, lineItem.grams, lineItem.quantity)
                        orderItem.pushProduct(product);
                     })
@@ -60,8 +61,10 @@ class OrdersDAO extends ShopifyClient {
                 
                 return ordersArray;
             }
+            return null;
         } catch(e) {
-            console.log(`Error retreiving products: ${e}`)
+            console.log(`Error retreiving products: ${e}`);
+            return null;
         }
     }
 }
