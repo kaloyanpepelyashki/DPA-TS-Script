@@ -14,22 +14,43 @@ class ProductsSoldMap {
             //The limit must be changed later
             const orders = await this.ordersDAO.getOrdersAfter("2023-01-01 12:00:00.000", 250);
 
+            let weightInGrams = {};
+
+            // orders.forEach((order: Order) => {
+            //     const orderProducts = order.products;
+            //     orderProducts.forEach((product: Product) => {
+
+            //         const productTotalWeight = product.totalWeight;
+
+            //         //Checks if the map has this key already
+            //         if(this.soldProductsWeightMap.has(product.productID)) {
+            //             //If tha map has the key, it re-calculates the total weight, by adding the current (in the loop) product's weight to the total weight in the map
+            //             const accumulatedWeight = this.soldProductsWeightMap.get(product.productID) + productTotalWeight
+            //             this.soldProductsWeightMap.set(product.productID, accumulatedWeight)
+            //         } else {
+            //         //If the product doesn't exist already, it sets it as a new product
+            //         this.soldProductsWeightMap.set(product.productID, productTotalWeight);
+            //         }
+            //     })
+            // })
+
             orders.forEach((order: Order) => {
                 const orderProducts = order.products;
-                orderProducts.forEach((product: Product) => {
 
+                orderProducts.forEach((product: Product) => {
                     const productTotalWeight = product.totalWeight;
 
-                    //Checks if the map has this key already
-                    if(this.soldProductsWeightMap.has(product.productID)) {
-                        //If tha map has the key, it re-calculates the total weight, by adding the current (in the loop) product's weight to the total weight in the map
-                        const accumulatedWeight = this.soldProductsWeightMap.get(product.productID) + productTotalWeight
-                        this.soldProductsWeightMap.set(product.productID, accumulatedWeight)
+                    if(weightInGrams[product.productID]) {
+                        weightInGrams[product.productID] += productTotalWeight;
                     } else {
-                    //If the product doesn't exist already, it sets it as a new product
-                    this.soldProductsWeightMap.set(product.productID, productTotalWeight);
+                        weightInGrams[product.productID] = productTotalWeight
                     }
                 })
+            })
+
+            Object.keys(weightInGrams).forEach(productID => {
+                const weightInKilograms = Number((weightInGrams[productID] / 1000).toFixed(3))
+                this.soldProductsWeightMap.set(Number(productID), weightInKilograms)
             })
         } catch(e) {
             console.log(`Error calculating ProductsSold Map: ${e.message}`)
