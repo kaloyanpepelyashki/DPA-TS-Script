@@ -9,13 +9,26 @@ class ProductsSoldMap {
   constructor() {}
 
   /** This method initalizes the map and calculates the total product weight sold based on the orders */
-  public async initialize(): Promise<void | null> {
+  protected async fetchOrders(): Promise<Order[] | null> {
     try {
+      /** Gets all orders from shopify through the ordersDAO*/
       //The limit must be changed later
-      const orders = await this.ordersDAO.getOrdersAfter(
+      const orders: Order[] = await this.ordersDAO.getOrdersAfter(
         "2023-01-01 12:00:00.000",
         250
       );
+
+      return orders;
+    } catch (e) {
+      console.log(`Error calculating ProductsSold Map: ${e.message}`);
+      throw new Error(
+        `Error fetching products from shopify database: ${e.message}`
+      );
+    }
+  }
+
+  protected calculateSoldProductsWeight(orders: Order[]): void | null {
+    try {
       orders.forEach((order: Order) => {
         const orderProducts = order.products;
         orderProducts.forEach((product: Product) => {
@@ -41,18 +54,24 @@ class ProductsSoldMap {
         });
       });
     } catch (e) {
-      console.log(`Error calculating ProductsSold Map: ${e.message}`);
-      return null;
+      console.log(`Error calculating sold products total weight: ${e.message}`);
+      throw new Error(
+        `Error calculating sold products total weight: ${e.message}`
+      );
     }
   }
 
   public async getSoldProductsWeight(): Promise<Map<number, number> | null> {
     try {
-      await this.initialize();
-      return this.soldProductsWeightMap;
+      const orders = await this.fetchOrders();
+      this.calculateSoldProductsWeight(orders);
+      if (this.soldProductsWeightMap.size !== 0) {
+        return this.soldProductsWeightMap;
+      }
+      return null;
     } catch (e) {
       console.log(`Error getting sold products: ${e.message}`);
-      return null;
+      throw new Error(`Error getting sold products total weight: ${e.message}`);
     }
   }
 }
