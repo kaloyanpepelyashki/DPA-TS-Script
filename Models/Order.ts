@@ -5,7 +5,7 @@ class Order {
   public products: Array<Product> = [];
   public productId: number;
   constructor(products?: Array<Product>) {
-    this.products = products;
+    products ? (this.products = products) : (this.products = []);
   }
 
   public pushProduct(product: Product) {

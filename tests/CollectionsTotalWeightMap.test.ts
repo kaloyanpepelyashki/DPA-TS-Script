@@ -16,6 +16,7 @@ describe("CollectionsTotalWeightMap", () => {
       ])
     );
 
+    //Mocking values
     ProductsSoldMap.prototype.getSoldProductsWeight = jest
       .fn()
       .mockResolvedValue(
@@ -35,7 +36,7 @@ describe("CollectionsTotalWeightMap", () => {
           [403, 1000],
           [104, 1200],
           [204, 1000],
-          [304, 0],
+          [304, 1],
           [404, 500],
         ])
       );
@@ -48,7 +49,7 @@ describe("CollectionsTotalWeightMap", () => {
         [1, 4.6], // Collection 1 total weight in kilograms (4.6 kg) (4600 g)
         [2, 3.15], // Collection 2 total weight in kg (1.5 kg) (3150 g)
         [3, 8.25], // Collection 3 total weight in kg (8.2 kg) (8250 g)
-        [4, 2.7], // Collection 4 total weight in kg (2.7 kg) (2700 g)
+        [4, 2.701], // Collection 4 total weight in kg (2.7 kg) (2701 g)
       ])
     );
   });
