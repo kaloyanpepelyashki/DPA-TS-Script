@@ -1,6 +1,6 @@
 name: DPA-Application CI
 
-on: [push], [pull]
+on: [push]
 
 jobs:
   build:
