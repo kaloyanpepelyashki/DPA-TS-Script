@@ -52,7 +52,7 @@ class CollectionsTotalWeightMap {
     }
   }
 
-  /**This method returns a Map, encapsulating the collections weight in kilograms */
+  /**This method returns a Map, encapsulating the collections weight in kilograms. */
   public async getCollectionsTotalWeight(): Promise<Map<
     number,
     number

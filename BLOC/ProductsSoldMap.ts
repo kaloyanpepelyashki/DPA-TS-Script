@@ -12,10 +12,9 @@ class ProductsSoldMap {
   protected async fetchOrders(): Promise<Order[] | null> {
     try {
       /** Gets all orders from shopify through the ordersDAO*/
-      //The limit must be changed later
-      const orders: Order[] = await this.ordersDAO.getOrdersAfter(
+      const orders: Order[] = await this.ordersDAO.getOrdersBetween(
         "2023-01-01 12:00:00.000",
-        250
+        "2024-01-01 12:00:00.000"
       );
 
       return orders;
@@ -27,6 +26,9 @@ class ProductsSoldMap {
     }
   }
 
+  /**This method calculates the total weight of a product sold. The method then pushes the calculated weight for each product to a map
+   * where the key is the product Id and the value is the weight
+   */
   protected calculateSoldProductsWeight(orders: Order[]): void | null {
     try {
       orders.forEach((order: Order) => {
@@ -61,6 +63,7 @@ class ProductsSoldMap {
     }
   }
 
+  /** This method fetches all orders, calculates the total weight sold for each of the products and returns the data in the formm of a map */
   public async getSoldProductsWeight(): Promise<Map<number, number> | null> {
     try {
       const orders = await this.fetchOrders();

@@ -9,7 +9,7 @@ class CollectionsMap {
   protected collectionsDAO: CollectionsDAO = CollectionsDAO.getInstance();
   constructor() {}
 
-  public async initialize(): Promise<void | null> {
+  protected async initialize(): Promise<void | null> {
     try {
       const result = await this.updateCollectionsMap();
       if (result === null) {
@@ -40,6 +40,7 @@ class CollectionsMap {
     }
   }
 
+  /** This method, when called, initises the Map that holds the collections' ids and each product id belonging to this collection, the method then returns the collections map */
   public async getDpaCollectionsMap(): Promise<Map<number, number[]> | null> {
     try {
       await this.initialize();
