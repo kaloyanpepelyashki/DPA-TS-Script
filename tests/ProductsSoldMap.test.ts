@@ -6,7 +6,7 @@ jest.mock("../ServiceLayer/OrdersDAO", () => {
   return {
     default: jest.fn(),
     getInstance: jest.fn().mockImplementation(() => ({
-      getOrdersAfter: jest
+      getOrdersBetween: jest
         .fn()
         .mockResolvedValue([
           new Order([
