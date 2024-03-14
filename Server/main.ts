@@ -1,14 +1,25 @@
 import CollectionsTotalWeightMap from "./BLOC/CollectionsTotalWeighMap";
 import OrdersDAO from "./ServiceLayer/OrdersDAO";
 
-const main = async () => {
+import * as express from "express";
+import * as cors from "cors";
+
+const app = express();
+app.use(cors());
+const port = 3000;
+
+app.get("/", async (req, res) => {
   const collectionsTotal = new CollectionsTotalWeightMap();
   const collectionsTotalWeight =
     await collectionsTotal.getCollectionsTotalWeight();
-  console.log(collectionsTotalWeight);
 
-  // const ordersDao: OrdersDAO = OrdersDAO.getInstance();
+  const valuesArray: Array<number> = Array.from(
+    collectionsTotalWeight.values()
+  );
 
-  // ordersDao.getAllOrdersAfter("2023-01-01 12:00:00.000");
-};
-main();
+  res.send(JSON.stringify(valuesArray));
+});
+
+app.listen(port, () => {
+  console.log(`app is running on ${port}`);
+});
