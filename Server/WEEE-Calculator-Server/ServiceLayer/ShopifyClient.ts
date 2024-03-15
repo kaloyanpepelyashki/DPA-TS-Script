@@ -27,6 +27,14 @@ class ShopifyClient {
       "ebits-dk.myshopify.com"
     );
   }
+
+  /**
+   *
+   * @returns An object containing the an instance of shopify and the session
+   */
+  public getShopifyInstance() {
+    return { shopify: this.shopify, session: this.session };
+  }
 }
 
 export default ShopifyClient;

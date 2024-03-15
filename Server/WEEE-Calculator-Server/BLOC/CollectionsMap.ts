@@ -1,4 +1,4 @@
-import CollectionsDAO from "../ServiceLayer/CollectionsDAO";
+import CollectionsDAO from "../ServiceLayer/DAOs/CollectionsDAO";
 
 /** This class is a blue print of a Map, that contains both a collection Id and the products belonging to it */
 class CollectionsMap {

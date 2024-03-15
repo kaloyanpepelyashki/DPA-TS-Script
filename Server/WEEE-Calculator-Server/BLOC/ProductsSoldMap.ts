@@ -1,6 +1,6 @@
 import Order from "../Models/Order";
 import Product from "../Models/Product";
-import OrdersDAO from "../ServiceLayer/OrdersDAO";
+import OrdersDAO from "../ServiceLayer/DAOs/OrdersDAO";
 
 /** This class is a blue print of a Map, that contains both a product Id and the total weight of sold products belonging to it  */
 class ProductsSoldMap {

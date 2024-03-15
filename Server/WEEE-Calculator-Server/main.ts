@@ -1,5 +1,6 @@
 import CollectionsTotalWeightMap from "./BLOC/CollectionsTotalWeighMap";
-import OrdersDAO from "./ServiceLayer/OrdersDAO";
+import OrdersDAO from "./ServiceLayer/DAOs/OrdersDAO";
+import CollectionsAgent from "./ServiceLayer/CreateCollections/CreateCollections";
 
 import express from "express";
 import cors from "cors";
@@ -18,6 +19,12 @@ app.get("/", async (req, res) => {
   );
 
   res.send(JSON.stringify(valuesArray));
+});
+
+app.get("/createCollection", async (req, res) => {
+  const collectionsAgent = CollectionsAgent.getInstance();
+
+  collectionsAgent.createCollection();
 });
 
 app.listen(port, () => {

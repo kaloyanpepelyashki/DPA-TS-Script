@@ -1,6 +1,6 @@
-import ShopifyClient from "./ShopifyClient";
-import Order from "../Models/Order";
-import Product from "../Models/Product";
+import ShopifyClient from "../ShopifyClient";
+import Order from "../../Models/Order";
+import Product from "../../Models/Product";
 import ProductDAO from "./ProductDAO";
 
 /** A class that is in charge of getting the orders objects from the Shopify database

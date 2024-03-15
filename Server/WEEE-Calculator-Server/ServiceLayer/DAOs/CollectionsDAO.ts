@@ -1,4 +1,4 @@
-import ShopifyClient from "./ShopifyClient";
+import ShopifyClient from "../ShopifyClient";
 
 /**This data access class is in charge of getting the collections object from the Shopify Database  */
 class CollectionsDAO extends ShopifyClient {
