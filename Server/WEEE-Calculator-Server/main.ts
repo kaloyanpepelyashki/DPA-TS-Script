@@ -1,8 +1,8 @@
 import CollectionsTotalWeightMap from "./BLOC/CollectionsTotalWeighMap";
 import OrdersDAO from "./ServiceLayer/OrdersDAO";
 
-import * as express from "express";
-import * as cors from "cors";
+import express from "express";
+import cors from "cors";
 
 const app = express();
 app.use(cors());
