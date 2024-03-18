@@ -28,6 +28,7 @@ class CollectionsDAO extends ShopifyClient {
       console.log(`Error finding collection: ${e.message}`);
     }
   }
+
   /** This method returns all products for a collection based on collection Id
    * @param {number} collectionId
    */

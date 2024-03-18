@@ -1,8 +1,8 @@
 import { Session, Shopify } from "@shopify/shopify-api";
 import ShopifyClient from "../ShopifyClient";
 
-export default class collectionsAgent {
-  public static instance: collectionsAgent;
+export default class CollectionsManager {
+  public static instance: CollectionsManager;
   private shopifyClient: ShopifyClient;
   private shiopify: Shopify;
   protected graphQlClient;
@@ -15,15 +15,15 @@ export default class collectionsAgent {
 
   public static getInstance() {
     if (this.instance == null) {
-      this.instance = new collectionsAgent();
+      this.instance = new CollectionsManager();
     }
 
     return this.instance;
   }
 
-  public createCollection() {
+  public createCollection(collectionName: string) {
     try {
-      this.graphQlClient.query({
+      const result = this.graphQlClient.query({
         data: {
           query: `mutation CollectionCreate($input: CollectionInput!) {
                     collectionCreate(input: $input) {
@@ -50,7 +50,7 @@ export default class collectionsAgent {
                   }`,
           variables: {
             input: {
-              title: "WEEE Test",
+              title: collectionName,
               descriptionHtml: "A test WEEE collection",
               ruleSet: {
                 appliedDisjunctively: false,
@@ -64,6 +64,8 @@ export default class collectionsAgent {
           },
         },
       });
+
+      return result;
     } catch (e: any) {
       console.log(`Error creating collection: ${e}`);
       throw new Error(`Error creating collection: ${e.message}`);

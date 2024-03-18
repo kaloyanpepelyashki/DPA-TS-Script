@@ -13,7 +13,7 @@ class OrdersDAO extends ShopifyClient {
   }
 
   public static getInstance(): OrdersDAO {
-    if (OrdersDAO.instance == null) {
+    if (!OrdersDAO.instance) {
       OrdersDAO.instance = new OrdersDAO();
     }
     return OrdersDAO.instance;
