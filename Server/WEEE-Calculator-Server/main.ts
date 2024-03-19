@@ -1,6 +1,7 @@
 import CollectionsTotalWeightMap from "./BLOC/CollectionsTotalWeighMap";
 import CollectionGraphDao from "./ServiceLayer/DAOs/CollectionsGraphDAO";
-import CollectionsAgent from "./ServiceLayer/CreateCollections/CreateCollections";
+import CollectionsAgent from "./ServiceLayer/CreateCollections/CollectionsManager";
+import ProductDAO from "./ServiceLayer/DAOs/ProductDAO";
 
 import express from "express";
 import cors from "cors";
@@ -26,6 +27,12 @@ app.get("/createCollection", async (req, res) => {
   const result = await graphDao.findCollectionIdByName("test collection title");
 
   console.log(result);
+});
+
+app.get("/products/all", async (req, res) => {
+  const productsDao = ProductDAO.getInstance();
+  const products = await productsDao.getProductsList();
+  res.send(JSON.stringify(products));
 });
 
 app.listen(port, () => {

@@ -58,13 +58,35 @@ class ProductDAO extends ShopifyClient {
     }
   }
 
+  /**
+   *
+   * @returns all products from the vendor's store
+   */
   public async getProductsList() {
     try {
-      const response = await this.shopify.rest.Product.all({
-        session: this.session,
-      });
+      let allProducts = [];
+      let sinceId = 0;
 
-      return response;
+      while (true) {
+        const products = await this.shopify.rest.Product.all({
+          session: this.session,
+          limit: 250,
+          since_id: sinceId,
+        });
+        //The loop breaks when there are no more products fetched.
+        if (products.data.length === 0) {
+          break;
+        }
+        allProducts.push(...products.data);
+        sinceId = products.data[products.data.length - 1].id; // Updates for next iteration the since_id to the last id from the current iteration
+      }
+
+      return allProducts;
+      // const response = await this.shopify.rest.Product.all({
+      //   session: this.session,
+      // });
+
+      // return response;
     } catch (e) {
       console.log(`Error getting products from : ${e.message}`);
     }
