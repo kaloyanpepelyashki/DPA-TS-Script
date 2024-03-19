@@ -1,12 +1,15 @@
 import { GraphqlClient, Session, Shopify } from "@shopify/shopify-api";
 import ShopifyClient from "../ShopifyClient";
 import CollectionsGraphDAO from "../DAOs/CollectionsGraphDAO";
+import CollectionsDAO from "../DAOs/CollectionsDAO";
 
 export default class CollectionsManager {
   public static instance: CollectionsManager;
   protected collectionsGraphDao: CollectionsGraphDAO;
+  protected collectionsRestDao: CollectionsDAO;
   protected constructor() {
     this.collectionsGraphDao = CollectionsGraphDAO.getInstance();
+    this.collectionsRestDao = CollectionsDAO.getInstance();
   }
 
   public static getInstance() {
@@ -34,13 +37,40 @@ export default class CollectionsManager {
 
   public async getWeeeCollections(
     collectionsNames: Array<string>
-  ): Array<number> {
+  ): Promise<Array<number>> {
     try {
-      let collectionIds = [];
+      let collectionIds: Array<number> = [];
       for (const collectionName of collectionsNames) {
-        const collectionId =
+        const colId: string =
           await this.collectionsGraphDao.findCollectionIdByName(collectionName);
+        collectionIds.push(Number(colId));
       }
+
+      return collectionIds;
+    } catch (e) {
+      throw new Error(e);
+    }
+  }
+
+  public async getCollectionProducts(collectionId: number) {
+    try {
+      const response = await this.collectionsRestDao.getCollectionProducts(
+        collectionId
+      );
+
+      return response;
+    } catch (e) {
+      throw new Error(e);
+    }
+  }
+
+  public async findCollectionById(collectionId: number) {
+    try {
+      const response = await this.collectionsRestDao.findCollectionById(
+        collectionId
+      );
+
+      return response;
     } catch (e) {
       throw new Error(e);
     }

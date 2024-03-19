@@ -5,14 +5,16 @@ import ProductsSoldMap from "./ProductsSoldMap";
  * The class proved a method for calculating the total weight for each collection
  */
 class CollectionsTotalWeightMap {
-  collectionsMap: CollectionsMap = new CollectionsMap();
-  productsMap: ProductsSoldMap = new ProductsSoldMap();
+  protected collectionsMap: CollectionsMap;
+  protected productsMap: ProductsSoldMap = new ProductsSoldMap();
+  protected weeeCollectionNames: Array<string>;
   private collections: Map<number, number[]>;
   private soldProductsWeight: Map<number, number>;
   constructor() {}
 
   protected async initialize() {
     try {
+      this.collectionsMap = new CollectionsMap(this.weeeCollectionNames);
       this.collections = await this.collectionsMap.getDpaCollectionsMap();
       this.soldProductsWeight = await this.productsMap.getSoldProductsWeight();
     } catch (e) {
@@ -52,12 +54,18 @@ class CollectionsTotalWeightMap {
     }
   }
 
-  /**This method returns a Map, encapsulating the collections weight in kilograms. */
-  public async getCollectionsTotalWeight(): Promise<Map<
-    number,
-    number
-  > | null> {
+  /**
+   * This method returns a Map, encapsulating the collections weight in kilograms.
+   * @param collectionNames
+   * @returns collectionsTotalWeightMap
+   */
+  public async getCollectionsTotalWeight(
+    collectionNames: Array<string>
+  ): Promise<Map<number, number> | null> {
     try {
+      //sets the weeeCollectionNames variable
+      this.weeeCollectionNames = collectionNames;
+
       let collectionsTotalWeightMap: Map<number, number> = new Map();
       const rawCollectionsWeight = await this.calculateCollectionsTotalWeight();
 

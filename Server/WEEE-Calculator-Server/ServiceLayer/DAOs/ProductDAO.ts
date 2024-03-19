@@ -82,11 +82,6 @@ class ProductDAO extends ShopifyClient {
       }
 
       return allProducts;
-      // const response = await this.shopify.rest.Product.all({
-      //   session: this.session,
-      // });
-
-      // return response;
     } catch (e) {
       console.log(`Error getting products from : ${e.message}`);
     }

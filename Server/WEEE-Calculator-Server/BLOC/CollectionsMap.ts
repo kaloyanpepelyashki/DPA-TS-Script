@@ -1,16 +1,24 @@
 import CollectionsDAO from "../ServiceLayer/DAOs/CollectionsDAO";
+import CollectionsManager from "../ServiceLayer/Services/CollectionsManager";
 
 /** This class is a blue print of a Map, that contains both a collection Id and the products belonging to it */
 class CollectionsMap {
   protected dpaCollectionsMap: Map<number, Array<number>> = new Map();
-  protected dpaCollectionIds: Array<number> = [
+  protected weeeCollectionIds: Array<number> = [
     608081805635, 608081871171, 608081674563, 608081641795,
   ];
-  protected collectionsDAO: CollectionsDAO = CollectionsDAO.getInstance();
-  constructor() {}
+  protected weeeCollectionNames: Array<string>;
+  protected collectionsDAO: CollectionsManager =
+    CollectionsManager.getInstance();
+  constructor(collectionNames: Array<string>) {
+    this.weeeCollectionNames = collectionNames;
+  }
 
   protected async initialize(): Promise<void | null> {
     try {
+      this.weeeCollectionIds = await this.collectionsDAO.getWeeeCollections(
+        this.weeeCollectionNames
+      );
       const result = await this.updateCollectionsMap();
       if (result === null) {
         return null;
@@ -23,7 +31,7 @@ class CollectionsMap {
 
   private async updateCollectionsMap(): Promise<void | null> {
     try {
-      for (const collectionId of this.dpaCollectionIds) {
+      for (const collectionId of this.weeeCollectionIds) {
         const collectionProducts =
           await this.collectionsDAO.getCollectionProducts(collectionId);
         const productsArray: Array<number> = [];

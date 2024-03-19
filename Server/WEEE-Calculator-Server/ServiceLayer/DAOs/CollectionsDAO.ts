@@ -15,7 +15,7 @@ class CollectionsDAO extends ShopifyClient {
     return this.instance;
   }
 
-  public async findCollection(collectionId: number) {
+  public async findCollectionById(collectionId: number) {
     try {
       const response = await this.shopify.rest.Collection.find({
         session: this.session,

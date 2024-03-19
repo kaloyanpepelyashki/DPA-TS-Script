@@ -1,6 +1,6 @@
 import CollectionsTotalWeightMap from "./BLOC/CollectionsTotalWeighMap";
 import CollectionGraphDao from "./ServiceLayer/DAOs/CollectionsGraphDAO";
-import CollectionsAgent from "./ServiceLayer/CreateCollections/CollectionsManager";
+import CollectionsManger from "./ServiceLayer/Services/CollectionsManager";
 import ProductDAO from "./ServiceLayer/DAOs/ProductDAO";
 
 import express from "express";
@@ -13,7 +13,10 @@ const port = 3000;
 app.get("/", async (req, res) => {
   const collectionsTotal = new CollectionsTotalWeightMap();
   const collectionsTotalWeight =
-    await collectionsTotal.getCollectionsTotalWeight();
+    await collectionsTotal.getCollectionsTotalWeight([
+      "WEEE - Small IT and telecommunication equipment",
+      "WEEE - Baerbare batterier",
+    ]);
 
   const valuesArray: Array<number> = Array.from(
     collectionsTotalWeight.values()
@@ -35,6 +38,6 @@ app.get("/products/all", async (req, res) => {
   res.send(JSON.stringify(products));
 });
 
-app.listen(port, () => {
+app.listen(port, async () => {
   console.log(`app is running on ${port}`);
 });
