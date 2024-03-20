@@ -24,7 +24,7 @@ class CollectionsGraphDAO extends ShopifyClient {
   public async findCollectionIdByName(collectionName: string): Promise<string> {
     try {
       const regEx: RegExp = new RegExp("\\s", "g");
-      const collectionHandle = collectionName.replace(regEx, "-");
+      const collectionHandle = collectionName.replace(regEx, "-").toLowerCase();
       console.log(collectionHandle);
       const response = await this.graphQlClient.query({
         data: {
@@ -41,7 +41,6 @@ class CollectionsGraphDAO extends ShopifyClient {
 
       const collectionid = response.body.data.collectionByHandle.id;
       const formattedId: string = collectionid.match(/\/(\d+)$/);
-
       if (formattedId) {
         return formattedId[1];
       } else {

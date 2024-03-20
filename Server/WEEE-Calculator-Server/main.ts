@@ -14,8 +14,9 @@ app.get("/", async (req, res) => {
   const collectionsTotal = new CollectionsTotalWeightMap();
   const collectionsTotalWeight =
     await collectionsTotal.getCollectionsTotalWeight([
-      "WEEE - Small IT and telecommunication equipment",
-      "WEEE - Baerbare batterier",
+      "WEEE Light sources",
+      "WEEE Small IT and telecommunication equipment",
+      "WEEE Portable batteries",
     ]);
 
   const valuesArray: Array<number> = Array.from(
