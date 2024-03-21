@@ -1,17 +1,17 @@
 import ShopifyClient from "../ShopifyClient";
 
 /** This class is in charge of retreiving products from the shopify database */
-class ProductDAO extends ShopifyClient {
-  private static instance: ProductDAO;
+class ProductsDAO extends ShopifyClient {
+  private static instance: ProductsDAO;
   private constructor() {
     super();
   }
 
-  public static getInstance(): ProductDAO {
-    if (ProductDAO.instance == null) {
-      ProductDAO.instance = new ProductDAO();
+  public static getInstance(): ProductsDAO {
+    if (ProductsDAO.instance == null) {
+      ProductsDAO.instance = new ProductsDAO();
     }
-    return ProductDAO.instance;
+    return ProductsDAO.instance;
   }
 
   /** This method returns the products that belong to a collectio
@@ -59,10 +59,11 @@ class ProductDAO extends ShopifyClient {
   }
 
   /**
-   *
-   * @returns all products from the vendor's store
+   * This method gets all products from the vendor's store based on the status of the prodcut
+   * @param status
+   * @returns all products from the vendor's store based on the status
    */
-  public async getProductsList() {
+  public async getProductsList(status?: string) {
     try {
       let allProducts = [];
       let sinceId = 0;
@@ -72,6 +73,7 @@ class ProductDAO extends ShopifyClient {
           session: this.session,
           limit: 250,
           since_id: sinceId,
+          status: status,
         });
         //The loop breaks when there are no more products fetched.
         if (products.data.length === 0) {
@@ -88,4 +90,4 @@ class ProductDAO extends ShopifyClient {
   }
 }
 
-export default ProductDAO;
+export default ProductsDAO;

@@ -6,7 +6,7 @@ import CollectionsDAO from "../DAOs/CollectionsDAO";
 /**
  * This class is an entry point for handling all interactions with the collections object part of the Shopify Admin API
  */
-export default class CollectionsManager {
+class CollectionsManager {
   public static instance: CollectionsManager;
   protected collectionsGraphDao: CollectionsGraphDAO;
   protected collectionsRestDao: CollectionsDAO;
@@ -111,3 +111,5 @@ export default class CollectionsManager {
     }
   }
 }
+
+export default CollectionsManager;
