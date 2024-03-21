@@ -22,7 +22,6 @@ class CollectionsDAO extends ShopifyClient {
         id: collectionId,
       });
 
-      console.log(response);
       return response;
     } catch (e) {
       console.log(`Error finding collection: ${e.message}`);

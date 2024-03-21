@@ -6,7 +6,7 @@ import ProductsSoldMap from "./ProductsSoldMap";
  */
 class CollectionsTotalWeightMap {
   protected collectionsMap: CollectionsMap;
-  protected productsMap: ProductsSoldMap = new ProductsSoldMap();
+  protected productsMap: ProductsSoldMap;
   protected weeeCollectionNames: Array<string>;
   private collections: Map<number, number[]>;
   private soldProductsWeight: Map<number, number>;
@@ -15,6 +15,7 @@ class CollectionsTotalWeightMap {
   protected async initialize() {
     try {
       this.collectionsMap = new CollectionsMap(this.weeeCollectionNames);
+      this.productsMap = new ProductsSoldMap();
       this.collections = await this.collectionsMap.getDpaCollectionsMap();
       this.soldProductsWeight = await this.productsMap.getSoldProductsWeight();
     } catch (e) {

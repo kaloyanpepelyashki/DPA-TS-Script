@@ -109,6 +109,57 @@ class CollectionsGraphDAO extends ShopifyClient {
       throw new Error(`Error creating collection: ${e.message}`);
     }
   }
+
+  /**
+   * This method pushes an array of product id's to a collection, usng the graphQl Shopify API
+   * @param collectionId
+   * @param products
+   * @returns
+   */
+  public async addProductsToCollection(
+    collectionId: string,
+    products: Array<string>
+  ) {
+    try {
+      let productsArray: Array<string> = [];
+
+      //Note the id's need to be pushed to an array, and afterwards the array is being pushed to the object being sent to the Shopify db
+      products.forEach((product) => {
+        productsArray.push(`gid://shopify/Product/${product}`);
+      });
+      const result = await this.graphQlClient.query({
+        data: {
+          query: `mutation collectionAddProducts($id: ID!, $productIds: [ID!]!) {
+          collectionAddProducts(id: $id, productIds: $productIds) {
+            collection {
+              id
+              title
+              productsCount
+              products(first: 10) {
+                nodes {
+                  id
+                  title
+                }
+              }
+            }
+            userErrors {
+              field
+              message
+            }
+          }
+        }`,
+          variables: {
+            id: `gid://shopify/Collection/${collectionId}`,
+            productIds: productsArray,
+          },
+        },
+      });
+      console.log(result.body.data);
+      return result;
+    } catch (e) {
+      throw new Error(`${e}`);
+    }
+  }
 }
 
 export default CollectionsGraphDAO;
