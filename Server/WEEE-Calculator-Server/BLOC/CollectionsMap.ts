@@ -16,7 +16,7 @@ class CollectionsMap {
 
   protected async initialize(): Promise<void | null> {
     try {
-      this.weeeCollectionIds = await this.collectionsDAO.getWeeeCollections(
+      this.weeeCollectionIds = await this.collectionsDAO.getWeeeCollectionsId(
         this.weeeCollectionNames
       );
       const result = await this.updateCollectionsMap();

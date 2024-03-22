@@ -54,12 +54,12 @@ class CollectionsGraphDAO extends ShopifyClient {
    *This method uses the shopify graphQl client and creates a collection in the vendor's store
    * @param collectionName
    * @param collectionDescription
-   * @returns void
+   * @returns boolean
    */
   public createCollection(
     collectionName: string,
     collectionDescription: string
-  ): void {
+  ): boolean {
     try {
       const result = this.graphQlClient.query({
         data: {
@@ -103,7 +103,13 @@ class CollectionsGraphDAO extends ShopifyClient {
         },
       });
 
-      return result;
+      if (result.collectionCreate.userErrors) {
+        throw new Error(
+          `Error creating collection: ${result.collectionCreate.userErrors}`
+        );
+      } else {
+        return true;
+      }
     } catch (e: any) {
       console.log(`Error creating collection: ${e}`);
       throw new Error(`Error creating collection: ${e.message}`);
@@ -119,7 +125,7 @@ class CollectionsGraphDAO extends ShopifyClient {
   public async addProductsToCollection(
     collectionId: string,
     products: Array<string>
-  ) {
+  ): Promise<boolean> {
     try {
       let productsArray: Array<string> = [];
 
@@ -155,7 +161,13 @@ class CollectionsGraphDAO extends ShopifyClient {
         },
       });
       console.log(result.body.data);
-      return result;
+      if (!result.body.data.collection) {
+        throw new Error(
+          `Error adding products to collection: ${result.body.data.userError}`
+        );
+      } else {
+        return true;
+      }
     } catch (e) {
       throw new Error(`${e}`);
     }

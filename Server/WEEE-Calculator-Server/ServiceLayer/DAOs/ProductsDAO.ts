@@ -64,6 +64,7 @@ class ProductsDAO extends ShopifyClient {
    * @returns all products from the vendor's store based on the status
    */
   public async getProductsList(status?: string) {
+    //TODO Consider using the GraphQL API for getting the products as it fetches less data
     try {
       let allProducts = [];
       let sinceId = 0;

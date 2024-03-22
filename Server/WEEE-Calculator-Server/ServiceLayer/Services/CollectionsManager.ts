@@ -28,17 +28,18 @@ class CollectionsManager {
    * @param {Map<string, string>} collections the key of the map is collection title and the value is the collection description
    */
   //The map should be <title, description>
-  public createCollectionsFor(collections: Map<string, string>) {
+  public createCollectionsFor(collections: Map<string, string>): boolean {
     try {
       for (let [key, value] of collections) {
         this.collectionsGraphDao.createCollection(key, value);
       }
+      return true;
     } catch (e) {
       throw new Error(e);
     }
   }
 
-  public async getWeeeCollections(
+  public async getWeeeCollectionsId(
     collectionsNames: Array<string>
   ): Promise<Array<number>> {
     try {
@@ -82,6 +83,17 @@ class CollectionsManager {
         return response.title;
       }
       return null;
+    } catch (e) {
+      throw new Error(e);
+    }
+  }
+
+  public async getCollectionIdByName(collectionName: string) {
+    try {
+      const response: string | null =
+        await this.collectionsGraphDao.findCollectionIdByName(collectionName);
+
+      return response;
     } catch (e) {
       throw new Error(e);
     }

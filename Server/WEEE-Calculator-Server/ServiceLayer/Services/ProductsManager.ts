@@ -20,6 +20,7 @@ class ProductsManager {
       const result = await this.productsDao.getProductsList("active");
 
       if (result) {
+        console.log(typeof result);
         return result;
       } else {
         return null;
