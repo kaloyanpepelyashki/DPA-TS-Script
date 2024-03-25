@@ -16,7 +16,7 @@ const collectionsManager: CollectionsManager = CollectionsManager.getInstance();
 const collectionsTotalWeightMap: CollectionsTotalWeightMap =
   new CollectionsTotalWeightMap();
 
-app.post("/", async (req, res) => {
+app.get("/", async (req, res) => {
   try {
     const collectionsTotalWeight =
       await collectionsTotalWeightMap.getCollectionsTotalWeight([
@@ -25,6 +25,7 @@ app.post("/", async (req, res) => {
         "WEEE Portable batteries",
       ]);
 
+    console.log(collectionsTotalWeight);
     const valuesArray: Array<number> = Array.from(
       collectionsTotalWeight.values()
     );
@@ -36,7 +37,7 @@ app.post("/", async (req, res) => {
 });
 
 /**
- * This rout is designated for creating collections
+ * This route is designated for creating collections
  * The rout expects to get an array of objects containing collection name and description, that are to be created.
  */
 app.post("/createCollections", async (req, res) => {
@@ -53,7 +54,7 @@ app.post("/createCollections", async (req, res) => {
 });
 
 /**
- * This rout is designated for getting all products
+ * This route is designated for getting all products
  * sends back an array of product objects
  */
 app.get("/products/all", async (req, res) => {
@@ -70,6 +71,10 @@ app.get("/products/all", async (req, res) => {
   }
 });
 
+/**
+ * This rout is designated for adding products to a collection
+ * The route expects an string array of product ids and a collection name.
+ */
 app.post("/addProductsToCollection", async (req, res) => {
   try {
     const collection: string = req.body.collection;

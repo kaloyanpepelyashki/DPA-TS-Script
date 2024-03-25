@@ -1,5 +1,5 @@
 import Order from "../Models/Order";
-import Product from "../Models/Product";
+import OrderProduct from "../Models/OrderProduct";
 import OrdersDAO from "../ServiceLayer/DAOs/OrdersDAO";
 
 /** This class is a blue print of a Map, that contains both a product Id and the total weight of sold products belonging to it  */
@@ -33,23 +33,23 @@ class ProductsSoldMap {
     try {
       orders.forEach((order: Order) => {
         const orderProducts = order.products;
-        orderProducts.forEach((product: Product) => {
+        orderProducts.forEach((product: OrderProduct) => {
           const productTotalWeight = product.totalWeight;
 
           //Checks if the map has this key already
-          if (this.soldProductsWeightMap.has(product.productID)) {
+          if (this.soldProductsWeightMap.has(product.productId)) {
             //If tha map has the key, it re-calculates the total weight, by adding the current (in the loop) product's weight to the total weight in the map
             const accumulatedWeight =
-              this.soldProductsWeightMap.get(product.productID) +
+              this.soldProductsWeightMap.get(product.productId) +
               productTotalWeight;
             this.soldProductsWeightMap.set(
-              product.productID,
+              product.productId,
               accumulatedWeight
             );
           } else {
             //If the product doesn't exist already, it sets it as a new product
             this.soldProductsWeightMap.set(
-              product.productID,
+              product.productId,
               productTotalWeight
             );
           }

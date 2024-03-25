@@ -1,6 +1,6 @@
 import ProductsSoldMap from "../BLOC/ProductsSoldMap";
 import Order from "../Models/Order";
-import Product from "../Models/Product";
+import OrderProduct from "../Models/OrderProduct";
 
 jest.mock("../ServiceLayer/OrdersDAO", () => {
   return {
@@ -10,24 +10,24 @@ jest.mock("../ServiceLayer/OrdersDAO", () => {
         .fn()
         .mockResolvedValue([
           new Order([
-            new Product(1, 22, 209, 2),
-            new Product(2, 8, 199, 1),
-            new Product(6, 2, 200, 1),
+            new OrderProduct(1, 22, 209, 2),
+            new OrderProduct(2, 8, 199, 1),
+            new OrderProduct(6, 2, 200, 1),
           ]),
           new Order([
-            new Product(3, 22, 500, 1),
-            new Product(2, 8, 199, 1),
-            new Product(9, 6, 260, 1),
+            new OrderProduct(3, 22, 500, 1),
+            new OrderProduct(2, 8, 199, 1),
+            new OrderProduct(9, 6, 260, 1),
           ]),
           new Order([
-            new Product(3, 22, 500, 4),
-            new Product(1, 8, 209, 1),
-            new Product(9, 6, 260, 1),
+            new OrderProduct(3, 22, 500, 4),
+            new OrderProduct(1, 8, 209, 1),
+            new OrderProduct(9, 6, 260, 1),
           ]),
           new Order([
-            new Product(3, 22, 500, 1),
-            new Product(2, 8, 199, 1),
-            new Product(9, 6, 260, 1),
+            new OrderProduct(3, 22, 500, 1),
+            new OrderProduct(2, 8, 199, 1),
+            new OrderProduct(9, 6, 260, 1),
           ]),
         ]),
     })),

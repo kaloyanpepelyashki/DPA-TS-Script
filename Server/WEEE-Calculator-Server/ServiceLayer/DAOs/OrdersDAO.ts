@@ -1,15 +1,17 @@
 import ShopifyClient from "../ShopifyClient";
 import Order from "../../Models/Order";
-import Product from "../../Models/Product";
-import ProductsDAO from "./ProductsDAO";
+import OrderProduct from "../../Models/OrderProduct";
+import ProductsManager from "../Services/ProductsManager";
 
 /** A class that is in charge of getting the orders objects from the Shopify database
  * The class extends the ShopifyClient client class and thus has access to all members part of the ShopifyClient class
  */
 class OrdersDAO extends ShopifyClient {
   private static instance: OrdersDAO;
+  protected productsManager: ProductsManager;
   private constructor() {
     super();
+    this.productsManager = ProductsManager.getInstance();
   }
 
   public static getInstance(): OrdersDAO {
@@ -55,8 +57,9 @@ class OrdersDAO extends ShopifyClient {
           if (order.billing_address.country === "Denmark") {
             const orderItem = new Order();
             order.line_items.forEach((lineItem) => {
-              const product = new Product(
+              const product = new OrderProduct(
                 lineItem.product_id,
+                lineItem.title,
                 lineItem.variant_id,
                 lineItem.grams,
                 lineItem.quantity
