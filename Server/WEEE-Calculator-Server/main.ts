@@ -16,21 +16,18 @@ const collectionsManager: CollectionsManager = CollectionsManager.getInstance();
 const collectionsTotalWeightMap: CollectionsTotalWeightMap =
   new CollectionsTotalWeightMap();
 
-app.get("/", async (req, res) => {
+app.post("/initCalculation", async (req, res) => {
   try {
+    const collectionTitles: Array<string> = req.body;
+    console.log(collectionTitles);
     const collectionsTotalWeight =
-      await collectionsTotalWeightMap.getCollectionsTotalWeight([
-        "WEEE Light sources",
-        "WEEE Small IT and telecommunication equipment",
-        "WEEE Portable batteries",
-      ]);
+      await collectionsTotalWeightMap.getCollectionsTotalWeight(
+        collectionTitles
+      );
 
-    console.log(collectionsTotalWeight);
-    const valuesArray: Array<number> = Array.from(
-      collectionsTotalWeight.values()
-    );
-
-    res.status(200).send(JSON.stringify(valuesArray));
+    res
+      .status(200)
+      .send(JSON.stringify(Object.fromEntries(collectionsTotalWeight)));
   } catch (e) {
     res.status(501).send(`Internal server error ${e}`);
   }
