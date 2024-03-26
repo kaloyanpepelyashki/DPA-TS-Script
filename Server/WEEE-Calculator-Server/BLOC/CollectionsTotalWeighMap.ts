@@ -1,10 +1,12 @@
 import CollectionsMap from "./CollectionsMap";
 import ProductsSoldMap from "./ProductsSoldMap";
+import CollectionsManager from "../ServiceLayer/Services/CollectionsManager";
 
 /** This class encapsulates the main logic for calculating the collection's total products sold in weight
  * The class proved a method for calculating the total weight for each collection
  */
 class CollectionsTotalWeightMap {
+  protected collectionsManager: CollectionsManager;
   protected collectionsMap: CollectionsMap;
   protected productsMap: ProductsSoldMap;
   protected weeeCollectionNames: Array<string>;
@@ -14,6 +16,7 @@ class CollectionsTotalWeightMap {
 
   protected async initialize() {
     try {
+      this.collectionsManager = CollectionsManager.getInstance();
       this.collectionsMap = new CollectionsMap(this.weeeCollectionNames);
       this.productsMap = new ProductsSoldMap();
       this.collections = await this.collectionsMap.getDpaCollectionsMap();
@@ -54,6 +57,50 @@ class CollectionsTotalWeightMap {
       return null;
     }
   }
+  /**
+   * This method converts collections's weights from grams into kilograms
+   * @param rawCollectionsWeight
+   * @returns a map containing the converted to kilograms collections weights
+   */
+  protected convertCollectionsUnit(rawCollectionsWeight): Map<number, number> {
+    let collectionsTotalWeightMap: Map<number, number> = new Map();
+    //Converting the collections weight from grams to kilograms
+    Object.keys(rawCollectionsWeight).forEach((collection) => {
+      const weightInKilograms = Number(
+        (rawCollectionsWeight[collection] / 1000).toFixed(3)
+      );
+      collectionsTotalWeightMap.set(Number(collection), weightInKilograms);
+    });
+
+    if (collectionsTotalWeightMap.size != null) {
+      return collectionsTotalWeightMap;
+    }
+  }
+
+  /**
+   *
+   * @param {Map<number, number>} collections
+   * @returns {Map<string, number>} collectionName => weight in kilograms
+   */
+  protected async convertIdToTitle(
+    collections: Map<number, number>
+  ): Promise<Map<string, number>> {
+    try {
+      //less computational expensive then iterating over the original map and changing its keys
+      let convertedMap: Map<string, number> = new Map();
+
+      for (const [key, value] of collections) {
+        const collectionTitle: string =
+          await this.collectionsManager.getCollectionNameById(key);
+
+        convertedMap.set(collectionTitle, value);
+      }
+
+      return convertedMap;
+    } catch (e) {
+      throw new Error(e);
+    }
+  }
 
   /**
    * This method returns a Map, encapsulating the collections weight in kilograms.
@@ -62,25 +109,19 @@ class CollectionsTotalWeightMap {
    */
   public async getCollectionsTotalWeight(
     collectionNames: Array<string>
-  ): Promise<Map<number, number> | null> {
+  ): Promise<Map<string, number> | null> {
     try {
       //sets the weeeCollectionNames variable
       this.weeeCollectionNames = collectionNames;
 
-      let collectionsTotalWeightMap: Map<number, number> = new Map();
       const rawCollectionsWeight = await this.calculateCollectionsTotalWeight();
 
       if (rawCollectionsWeight !== null) {
-        //Converting the collections weight from grams to kilograms
-        Object.keys(rawCollectionsWeight).forEach((collection) => {
-          const weightInKilograms = Number(
-            (rawCollectionsWeight[collection] / 1000).toFixed(3)
-          );
-          collectionsTotalWeightMap.set(Number(collection), weightInKilograms);
-        });
+        let collectionsTotalWeightMap: Map<number, number> =
+          this.convertCollectionsUnit(rawCollectionsWeight);
 
         if (collectionsTotalWeightMap.size != null) {
-          return collectionsTotalWeightMap;
+          return this.convertIdToTitle(collectionsTotalWeightMap);
         }
       } else {
         return null;

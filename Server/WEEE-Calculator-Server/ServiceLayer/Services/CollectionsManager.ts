@@ -73,14 +73,14 @@ class CollectionsManager {
     }
   }
 
-  public async getCollectionNameById(collectionId: number) {
+  public async getCollectionNameById(collectionId: number): Promise<string> {
     try {
       const response = await this.collectionsRestDao.findCollectionById(
         collectionId
       );
-
       if (response) {
-        return response.title;
+        const title: string = response.title;
+        return title;
       }
       return null;
     } catch (e) {
