@@ -1,18 +1,10 @@
 import ShopifyClient from "../ShopifyClient";
 
+//TODO Change the structure of the class, so it can take in an accessToken and a host to be passed down to the ShopifyClient class
 /**This data access class is in charge of getting the collections object from the Shopify Database  */
 class CollectionsDAO extends ShopifyClient {
-  public static instance: CollectionsDAO;
-  private constructor() {
-    super();
-  }
-
-  public static getInstance() {
-    if (this.instance == null) {
-      this.instance = new CollectionsDAO();
-    }
-
-    return this.instance;
+  public constructor(accessToken: string, hostName: string) {
+    super(accessToken, hostName);
   }
 
   public async findCollectionById(collectionId: number) {

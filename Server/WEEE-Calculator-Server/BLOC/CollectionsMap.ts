@@ -1,6 +1,7 @@
 import CollectionsDAO from "../ServiceLayer/DAOs/CollectionsDAO";
 import CollectionsManager from "../ServiceLayer/Services/CollectionsManager";
 
+//TODO Change the structure of the class, it needs to pass down the class tree accessToken and host, when initialising
 /** This class is a blue print of a Map, that contains both a collection Id and the products belonging to it */
 class CollectionsMap {
   protected dpaCollectionsMap: Map<number, Array<number>> = new Map();
@@ -8,7 +9,7 @@ class CollectionsMap {
     608081805635, 608081871171, 608081674563, 608081641795,
   ];
   protected weeeCollectionNames: Array<string>;
-  protected collectionsDAO: CollectionsManager =
+  protected collectionsManager: CollectionsManager =
     CollectionsManager.getInstance();
   constructor(collectionNames: Array<string>) {
     this.weeeCollectionNames = collectionNames;
@@ -16,9 +17,10 @@ class CollectionsMap {
 
   protected async initialize(): Promise<void | null> {
     try {
-      this.weeeCollectionIds = await this.collectionsDAO.getWeeeCollectionsId(
-        this.weeeCollectionNames
-      );
+      this.weeeCollectionIds =
+        await this.collectionsManager.getWeeeCollectionsId(
+          this.weeeCollectionNames
+        );
       const result = await this.updateCollectionsMap();
       if (result === null) {
         return null;
@@ -33,7 +35,7 @@ class CollectionsMap {
     try {
       for (const collectionId of this.weeeCollectionIds) {
         const collectionProducts =
-          await this.collectionsDAO.getCollectionProducts(collectionId);
+          await this.collectionsManager.getCollectionProducts(collectionId);
         const productsArray: Array<number> = [];
 
         collectionProducts.products.forEach((product) => {

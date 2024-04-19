@@ -1,20 +1,13 @@
 import ShopifyClient from "../ShopifyClient";
 
+//TODO Change the structure of the class, so it can take in an accessToken and a host to be passed down to the ShopifyClient class
 class CollectionsGraphDAO extends ShopifyClient {
-  protected static instance: CollectionsGraphDAO;
   protected graphQlClient;
-  protected constructor() {
-    super();
+  public constructor(accessToken: string, hostName: string) {
+    super(accessToken, hostName);
     this.graphQlClient = new this.shopify.clients.Graphql({
       session: this.session,
     });
-  }
-
-  public static getInstance() {
-    if (!this.instance) {
-      this.instance = new CollectionsGraphDAO();
-    }
-    return this.instance;
   }
 
   /**This method finds the collection id based on its name

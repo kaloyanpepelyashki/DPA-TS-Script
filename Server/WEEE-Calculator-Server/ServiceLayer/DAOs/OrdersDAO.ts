@@ -7,18 +7,9 @@ import ProductsManager from "../Services/ProductsManager";
  * The class extends the ShopifyClient client class and thus has access to all members part of the ShopifyClient class
  */
 class OrdersDAO extends ShopifyClient {
-  private static instance: OrdersDAO;
-  protected productsManager: ProductsManager;
-  private constructor() {
-    super();
-    this.productsManager = ProductsManager.getInstance();
-  }
-
-  public static getInstance(): OrdersDAO {
-    if (!OrdersDAO.instance) {
-      OrdersDAO.instance = new OrdersDAO();
-    }
-    return OrdersDAO.instance;
+  //TODO Change the structure of the class, so it can take in an accessToken and a host to be passed down to the ShopifyClient class
+  constructor(accessToken: string, hostName: string) {
+    super(accessToken, hostName);
   }
 
   /** This method returns the whole orders object
