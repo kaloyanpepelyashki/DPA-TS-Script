@@ -3,6 +3,9 @@ import OrdersDAO from "../DAOs/OrdersDAO";
 import CollectionsDAO from "../DAOs/CollectionsDAO";
 import CollectionsGraphDAO from "../DAOs/CollectionsGraphDAO";
 
+/**
+ * A factory class for the different Dao modules
+ */
 class DaoFactory {
   private accessToken: string;
   private hostName: string;
@@ -12,18 +15,24 @@ class DaoFactory {
     this.hostName = hostName;
   }
 
-  public getDAO(
-    daoType: string
-  ): ProductsDAO | OrdersDAO | CollectionsDAO | CollectionsGraphDAO {
+  /**
+   * getDao method
+   * The method is in charge for returning whichever DAO instance is needed
+   * @param {string} daoType {"productsDao" | "ordersDao" | "collectionsRestDao" | collectionsGraphDao};
+   * @returns {ProductsDAO | OrdersDAO | CollectionsDAO | CollectionsGraphDAO}
+   */
+  public getDAO<
+    T extends ProductsDAO | OrdersDAO | CollectionsDAO | CollectionsGraphDAO
+  >(daoType: string): T {
     switch (daoType) {
       case "productsDao":
-        return new ProductsDAO(this.accessToken, this.hostName);
+        return new ProductsDAO(this.accessToken, this.hostName) as T;
       case "ordersDao":
-        return new OrdersDAO(this.accessToken, this.hostName);
+        return new OrdersDAO(this.accessToken, this.hostName) as T;
       case "collectionsRestDao":
-        return new CollectionsDAO(this.accessToken, this.hostName);
+        return new CollectionsDAO(this.accessToken, this.hostName) as T;
       case "collectionsGraphDao":
-        return new CollectionsGraphDAO(this.accessToken, this.hostName);
+        return new CollectionsGraphDAO(this.accessToken, this.hostName) as T;
       default:
     }
   }

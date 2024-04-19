@@ -9,10 +9,13 @@ class CollectionsMap {
     608081805635, 608081871171, 608081674563, 608081641795,
   ];
   protected weeeCollectionNames: Array<string>;
-  protected collectionsManager: CollectionsManager =
-    CollectionsManager.getInstance();
-  constructor(collectionNames: Array<string>) {
+  protected collectionsManager: CollectionsManager;
+  constructor(
+    collectionNames: Array<string>,
+    collectionsManager: CollectionsManager
+  ) {
     this.weeeCollectionNames = collectionNames;
+    this.collectionsManager = collectionsManager;
   }
 
   protected async initialize(): Promise<void | null> {

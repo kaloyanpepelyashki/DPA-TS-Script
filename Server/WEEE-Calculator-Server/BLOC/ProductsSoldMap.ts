@@ -5,8 +5,10 @@ import OrdersDAO from "../ServiceLayer/DAOs/OrdersDAO";
 /** This class is a blue print of a Map, that contains both a product Id and the total weight of sold products belonging to it  */
 class ProductsSoldMap {
   protected soldProductsWeightMap: Map<number, number> = new Map();
-  protected ordersDAO: OrdersDAO = OrdersDAO.getInstance();
-  constructor() {}
+  protected ordersDAO: OrdersDAO;
+  constructor(ordersDao: OrdersDAO) {
+    this.ordersDAO = ordersDao;
+  }
 
   /** This method initalizes the map and calculates the total product weight sold based on the orders */
   protected async fetchOrders(): Promise<Order[] | null> {

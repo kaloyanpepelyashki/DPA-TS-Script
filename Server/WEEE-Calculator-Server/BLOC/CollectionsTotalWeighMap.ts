@@ -1,6 +1,7 @@
 import CollectionsMap from "./CollectionsMap";
 import ProductsSoldMap from "./ProductsSoldMap";
 import CollectionsManager from "../ServiceLayer/Services/CollectionsManager";
+import OrdersDAO from "../ServiceLayer/DAOs/OrdersDAO";
 
 /** This class encapsulates the main logic for calculating the collection's total products sold in weight
  * The class proved a method for calculating the total weight for each collection
@@ -9,16 +10,23 @@ class CollectionsTotalWeightMap {
   protected collectionsManager: CollectionsManager;
   protected collectionsMap: CollectionsMap;
   protected productsMap: ProductsSoldMap;
-  protected weeeCollectionNames: Array<string>;
   private collections: Map<number, number[]>;
   private soldProductsWeight: Map<number, number>;
-  constructor() {}
+  constructor(
+    collectionsManager: CollectionsManager,
+    ordersDao: OrdersDAO,
+    weeeCollectionNames: Array<string>
+  ) {
+    this.collectionsManager = collectionsManager;
+    this.productsMap = new ProductsSoldMap(ordersDao);
+    this.collectionsMap = new CollectionsMap(
+      weeeCollectionNames,
+      this.collectionsManager
+    );
+  }
 
   protected async initialize() {
     try {
-      this.collectionsManager = CollectionsManager.getInstance();
-      this.collectionsMap = new CollectionsMap(this.weeeCollectionNames);
-      this.productsMap = new ProductsSoldMap();
       this.collections = await this.collectionsMap.getDpaCollectionsMap();
       this.soldProductsWeight = await this.productsMap.getSoldProductsWeight();
     } catch (e) {
@@ -104,16 +112,13 @@ class CollectionsTotalWeightMap {
 
   /**
    * This method returns a Map, encapsulating the collections weight in kilograms.
-   * @param collectionNames
    * @returns collectionsTotalWeightMap
    */
-  public async getCollectionsTotalWeight(
-    collectionNames: Array<string>
-  ): Promise<Map<string, number> | null> {
+  public async getCollectionsTotalWeight(): Promise<Map<
+    string,
+    number
+  > | null> {
     try {
-      //sets the weeeCollectionNames variable
-      this.weeeCollectionNames = collectionNames;
-
       const rawCollectionsWeight = await this.calculateCollectionsTotalWeight();
 
       if (rawCollectionsWeight !== null) {
