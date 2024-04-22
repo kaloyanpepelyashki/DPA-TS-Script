@@ -1,5 +1,5 @@
 import Product from "../../Models/Product";
-import ProductsDAO from "../DAOs/ProductsDAO";
+import ProductsDAO from "../../DAOs/ProductsDAO";
 
 // //TODO Change the structure of the class, it needs to pass down the class tree accessToken and host
 // class ProductsManager {

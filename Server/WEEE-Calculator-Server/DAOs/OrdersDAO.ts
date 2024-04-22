@@ -1,7 +1,7 @@
-import ShopifyClient from "../ShopifyClient";
-import Order from "../../Models/Order";
-import OrderProduct from "../../Models/OrderProduct";
-import ProductsManager from "../Services/ProductsManager";
+import ShopifyClient from "../ServiceLayer/ShopifyClient";
+import Order from "../Models/Order";
+import OrderProduct from "../Models/OrderProduct";
+import ProductsManager from "../ServiceLayer/Services/ProductsManager";
 
 /** A class that is in charge of getting the orders objects from the Shopify database
  * The class extends the ShopifyClient client class and thus has access to all members part of the ShopifyClient class

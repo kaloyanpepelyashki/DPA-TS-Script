@@ -1,7 +1,7 @@
 import CollectionsMap from "./CollectionsMap";
 import ProductsSoldMap from "./ProductsSoldMap";
 import CollectionsManager from "../ServiceLayer/Services/CollectionsManager";
-import OrdersDAO from "../ServiceLayer/DAOs/OrdersDAO";
+import OrdersDAO from "../DAOs/OrdersDAO";
 
 /** This class encapsulates the main logic for calculating the collection's total products sold in weight
  * The class proved a method for calculating the total weight for each collection

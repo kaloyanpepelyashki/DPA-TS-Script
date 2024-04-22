@@ -1,26 +1,31 @@
+import express, { Request } from "express";
+import cors from "cors";
+
+//Services Imports
 import CollectionsTotalWeightMap from "./BLOC/CollectionsTotalWeighMap";
 import CollectionsManager from "./ServiceLayer/Services/CollectionsManager";
 import ProductsManager from "./ServiceLayer/Services/ProductsManager";
+import CollectionsCalculator from "./ServiceLayer/Services/CollectionsCalculator";
 
-import express from "express";
-import cors from "cors";
-import DaoFactory from "./ServiceLayer/Factory/DaoFactory";
-import ProductsDAO from "./ServiceLayer/DAOs/ProductsDAO";
-import CollectionsGraphDAO from "./ServiceLayer/DAOs/CollectionsGraphDAO";
-import CollectionsDAO from "./ServiceLayer/DAOs/CollectionsDAO";
-import OrdersDAO from "./ServiceLayer/DAOs/OrdersDAO";
+import DaoFactory from "./Factory/DaoFactory";
+
+//DAO imports
+import ProductsDAO from "./DAOs/ProductsDAO";
+import CollectionsGraphDAO from "./DAOs/CollectionsGraphDAO";
+import CollectionsDAO from "./DAOs/CollectionsDAO";
+import OrdersDAO from "./DAOs/OrdersDAO";
+
+//Utilities Imports
+import RequestUtils from "./Utilities/RequestUtils ";
 
 const app = express();
 app.use(express.json());
 app.use(cors());
 const port = 3000;
 
-app.post("/initCalculation", async (req, res) => {
+app.post("/initCalculation", async (req: Request, res) => {
   try {
-    const accessToken: string = req.headers["access-token"] as
-      | string
-      | undefined;
-    const hostName: string = req.headers["host-name"] as string | undefined;
+    const { accessToken, hostName } = RequestUtils.extractHeaders(req);
     console.log("accessToken: ", accessToken);
     console.log("host-name: ", hostName);
 
@@ -36,24 +41,19 @@ app.post("/initCalculation", async (req, res) => {
           "collectionsGraphDao"
         );
 
-        const collectionsManager: CollectionsManager = new CollectionsManager(
-          collectionsGraphDao,
-          collectionsRestDao
+        const collectionsCalculator = new CollectionsCalculator(
+          ordersDao,
+          collectionsRestDao,
+          collectionsGraphDao
         );
-
-        const collectionsTotalWeightMap: CollectionsTotalWeightMap =
-          new CollectionsTotalWeightMap(
-            collectionsManager,
-            ordersDao,
+        const collectionsTotalWeights =
+          await collectionsCalculator.calculateCollectionsTotalWeight(
             collectionTitles
           );
 
-        const collectionsTotalWeight =
-          await collectionsTotalWeightMap.getCollectionsTotalWeight();
-
         res
           .status(200)
-          .send(JSON.stringify(Object.fromEntries(collectionsTotalWeight)));
+          .send(JSON.stringify(Object.fromEntries(collectionsTotalWeights)));
       } else {
         res.status(400);
       }
@@ -100,15 +100,10 @@ app.post("/initCalculation", async (req, res) => {
 //   }
 // });
 
-app.get("/products/all", async (req, res) => {
+app.get("/products/all", async (req: Request, res) => {
   try {
-    const accessToken: string = req.headers["access-token"] as
-      | string
-      | undefined;
-    const hostName: string = req.headers["host-name"] as string | undefined;
+    const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
-    console.log("accessToken: ", accessToken);
-    console.log("host-name: ", hostName);
     if (!accessToken || !hostName) {
       res.status(400).send("Missing headers");
       console.log("Error, missing headers");
@@ -118,8 +113,9 @@ app.get("/products/all", async (req, res) => {
       const productsDao: ProductsDAO = daoFactory.getDAO("productsDao");
 
       const productManager = new ProductsManager(productsDao);
-      const activeProducts = productManager.getAllActiveProducts();
+      const activeProducts = await productManager.getAllActiveProducts();
 
+      console.log(activeProducts);
       return activeProducts;
     }
   } catch (e) {

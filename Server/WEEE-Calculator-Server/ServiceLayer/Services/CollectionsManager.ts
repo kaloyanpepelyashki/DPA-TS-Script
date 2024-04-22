@@ -1,7 +1,7 @@
 import { GraphqlClient, Session, Shopify } from "@shopify/shopify-api";
 import ShopifyClient from "../ShopifyClient";
-import CollectionsGraphDAO from "../DAOs/CollectionsGraphDAO";
-import CollectionsDAO from "../DAOs/CollectionsDAO";
+import CollectionsGraphDAO from "../../DAOs/CollectionsGraphDAO";
+import CollectionsDAO from "../../DAOs/CollectionsDAO";
 //TODO Change the structure of the class, it needs to pass down the class tree accessToken and host
 /**
  * This class is an entry point for handling all interactions with the collections object part of the Shopify Admin API

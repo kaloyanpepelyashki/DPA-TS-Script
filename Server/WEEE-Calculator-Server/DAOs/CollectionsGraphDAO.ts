@@ -1,4 +1,4 @@
-import ShopifyClient from "../ShopifyClient";
+import ShopifyClient from "../ServiceLayer/ShopifyClient";
 
 //TODO Change the structure of the class, so it can take in an accessToken and a host to be passed down to the ShopifyClient class
 class CollectionsGraphDAO extends ShopifyClient {

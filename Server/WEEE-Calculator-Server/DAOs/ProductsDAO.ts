@@ -1,4 +1,4 @@
-import ShopifyClient from "../ShopifyClient";
+import ShopifyClient from "../ServiceLayer/ShopifyClient";
 
 /** This class is in charge of retreiving products from the shopify database */
 //TODO Change the structure of the class, so it can take in an accessToken and a host to be passed down to the ShopifyClient class

@@ -1,4 +1,4 @@
-import CollectionsDAO from "../ServiceLayer/DAOs/CollectionsDAO";
+import CollectionsDAO from "../DAOs/CollectionsDAO";
 import CollectionsManager from "../ServiceLayer/Services/CollectionsManager";
 
 //TODO Change the structure of the class, it needs to pass down the class tree accessToken and host, when initialising
