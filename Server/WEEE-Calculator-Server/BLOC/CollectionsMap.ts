@@ -34,6 +34,7 @@ class CollectionsMap {
     }
   }
 
+  //
   private async updateCollectionsMap(): Promise<void | null> {
     try {
       for (const collectionId of this.weeeCollectionIds) {
