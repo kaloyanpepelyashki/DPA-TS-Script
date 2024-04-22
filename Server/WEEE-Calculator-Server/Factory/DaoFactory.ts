@@ -23,7 +23,13 @@ class DaoFactory {
    */
   public getDAO<
     T extends ProductsDAO | OrdersDAO | CollectionsDAO | CollectionsGraphDAO
-  >(daoType: string): T {
+  >(
+    daoType:
+      | "productsDao"
+      | "ordersDao"
+      | "collectionsRestDao"
+      | "collectionsGraphDao"
+  ): T {
     switch (daoType) {
       case "productsDao":
         return new ProductsDAO(this.accessToken, this.hostName) as T;
@@ -34,6 +40,7 @@ class DaoFactory {
       case "collectionsGraphDao":
         return new CollectionsGraphDAO(this.accessToken, this.hostName) as T;
       default:
+        throw new Error(`Invalid DAO type input: ${daoType}`);
     }
   }
 }

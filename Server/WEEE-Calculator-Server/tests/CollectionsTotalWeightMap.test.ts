@@ -1,9 +1,23 @@
 import CollectionsTotalWeightMap from "../BLOC/CollectionsTotalWeighMap";
 import CollectionsMap from "../BLOC/CollectionsMap";
 import ProductsSoldMap from "../BLOC/ProductsSoldMap";
+import CollectionsCalculator from "../ServiceLayer/Services/CollectionsCalculator";
+import DaoFactory from "../Factory/DaoFactory";
+import OrdersDAO from "../DAOs/OrdersDAO";
 
 jest.mock("../BLOC/CollectionsMap");
 jest.mock("../BLOC/ProductsSoldMap");
+
+jest.mock("../DAOs/CollectionsDAO", () => {
+  return class {
+    findCollectionById(collectionId: number) {
+      return { id: collectionId, title: "Mock collection title" };
+    }
+  };
+});
+jest.mock("../DAOs/CollectionsGraphDAO");
+jest.mock("../DAOs/OrdersDAO");
+jest.mock("../DAOs/ProductsDAO");
 
 describe("CollectionsTotalWeightMap", () => {
   it("Should calculate the total weight of products sold for each collection", async () => {
@@ -40,8 +54,14 @@ describe("CollectionsTotalWeightMap", () => {
           [404, 500],
         ])
       );
-    const collectionsTotalWeightMap = new CollectionsTotalWeightMap();
-    const result = await collectionsTotalWeightMap.getCollectionsTotalWeight();
+    // const collectionsTotalWeightMap = new CollectionsTotalWeightMap();
+    // const result = await collectionsTotalWeightMap.getCollectionsTotalWeight();
+
+    const orderDao = (DaoFactory.prototype.getDAO = jest
+      .fn()
+      .mockResolvedValue(new OrdersDAO("testAccessToken", "testHostName")));
+
+    const collectionsCalculator = new CollectionsCalculator();
 
     // Expected results
     expect(result).toEqual(

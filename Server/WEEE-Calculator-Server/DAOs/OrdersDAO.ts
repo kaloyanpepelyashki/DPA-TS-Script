@@ -7,8 +7,7 @@ import ProductsManager from "../ServiceLayer/Services/ProductsManager";
  * The class extends the ShopifyClient client class and thus has access to all members part of the ShopifyClient class
  */
 class OrdersDAO extends ShopifyClient {
-  //TODO Change the structure of the class, so it can take in an accessToken and a host to be passed down to the ShopifyClient class
-  constructor(accessToken: string, hostName: string) {
+  public constructor(accessToken: string, hostName: string) {
     super(accessToken, hostName);
   }
 
