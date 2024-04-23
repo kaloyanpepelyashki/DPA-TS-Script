@@ -5,6 +5,8 @@ import CollectionsGraphDAO from "../DAOs/CollectionsGraphDAO";
 
 /**
  * A factory class for the different Dao modules
+ * The class constructor expects parameters string accessToken and string hostName.
+ * The accessToken and hostName are passed to the different DAO objects when instantiating them
  */
 class DaoFactory {
   private accessToken: string;

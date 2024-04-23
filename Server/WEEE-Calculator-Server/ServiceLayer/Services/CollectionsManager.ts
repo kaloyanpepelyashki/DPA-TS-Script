@@ -5,6 +5,7 @@ import CollectionsDAO from "../../DAOs/CollectionsDAO";
 //TODO Change the structure of the class, it needs to pass down the class tree accessToken and host
 /**
  * This class is an entry point for handling all interactions with the collections object part of the Shopify Admin API
+ * The class constructor expects parameters collectionsGraphDao and collectionsRestDao
  */
 // class CollectionsManager {
 //   public static instance: CollectionsManager;
