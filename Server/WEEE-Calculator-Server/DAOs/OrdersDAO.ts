@@ -30,7 +30,7 @@ class OrdersDAO extends ShopifyClient {
       return null;
     }
   }
-  /** This method returns an array of order objects, containing an array of objects, representing each order's product that fit the condition of being ordered after the specific date
+  /** This method returns an array of OrderProduct objects, containing an array of objects, representing each order's product that fit the condition of being ordered after the specific date
    * @param {string} minDate  (ISO 8601 format)
    * @param {string} maxDate (ISO 8601 format)
    */

@@ -41,6 +41,7 @@ class ProductsSoldMap {
           //Checks if the map has this key already
           if (this.soldProductsWeightMap.has(product.productId)) {
             //If tha map has the key, it re-calculates the total weight, by adding the current (in the loop) product's weight to the total weight in the map
+            //The weight here is in grams
             const accumulatedWeight =
               this.soldProductsWeightMap.get(product.productId) +
               productTotalWeight;
