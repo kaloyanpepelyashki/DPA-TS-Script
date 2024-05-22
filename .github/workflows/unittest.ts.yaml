@@ -42,7 +42,7 @@ jobs:
         working-directory: ./Server/WEEE-Calculator-Server/
 
       - name: Compile TypeScript
-        run: npm run build
+        run: tsc
         working-directory: ./Server/WEEE-Calculator-Server/
 
       - name: Login to DockerHub
