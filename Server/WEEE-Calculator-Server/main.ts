@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(cors());
 const port = 3000;
 
-app.post("/initCalculation", async (req: Request, res) => {
+app.post("/api/v1/initCalculation", async (req: Request, res) => {
   try {
     const { accessToken, hostName } = RequestUtils.extractHeaders(req);
     console.log("accessToken: ", accessToken);
@@ -72,7 +72,7 @@ app.post("/initCalculation", async (req: Request, res) => {
  * The route expects headers with string accessToken and string hostName
  * The rout expects to get an array of Maps containing collection name as key and collection description as value.
  */
-app.post("/createCollection", async (req: Request, res: Response) => {
+app.post("/api/v1/createCollection", async (req: Request, res: Response) => {
   try {
     const { accessToken, hostName } = RequestUtils.extractHeaders(req);
     if (!accessToken || !hostName) {
@@ -112,7 +112,7 @@ app.post("/createCollection", async (req: Request, res: Response) => {
  * The route expects headers with string accessToken and string hostName
  * The route sends back an array of product objects
  */
-app.get("/products/all", async (req: Request, res) => {
+app.get("/api/v1/products/all", async (req: Request, res) => {
   try {
     const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
@@ -145,50 +145,57 @@ app.get("/products/all", async (req: Request, res) => {
  *   "products": ["productId", "productId", ...]
  * }
  */
-app.post("/addProductsToCollection", async (req: Request, res: Response) => {
-  try {
-    const { accessToken, hostName } = RequestUtils.extractHeaders(req);
+app.post(
+  "/api/v1/addProductsToCollection",
+  async (req: Request, res: Response) => {
+    try {
+      const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
-    if (!accessToken || !hostName) {
-      res.status(400).send("Missing headers");
-      return;
-    }
+      if (!accessToken || !hostName) {
+        res.status(400).send("Missing headers");
+        return;
+      }
 
-    const collectionName: string = req.body.collection;
-    const products: Array<string> = req.body.products;
+      const collectionName: string = req.body.collection;
+      const products: Array<string> = req.body.products;
 
-    const daoFactory: DaoFactory = new DaoFactory(accessToken, hostName);
-    const collectionsRestDao: CollectionsDAO =
-      daoFactory.getDAO("collectionsRestDao");
-    const collectionsGraphDao: CollectionsGraphDAO = daoFactory.getDAO(
-      "collectionsGraphDao"
-    );
-    const collectionsProductService: CollectionProductService =
-      new CollectionProductService(collectionsGraphDao, collectionsRestDao);
-
-    const result: boolean =
-      await collectionsProductService.addProductsToCollection(
-        collectionName,
-        products
+      const daoFactory: DaoFactory = new DaoFactory(accessToken, hostName);
+      const collectionsRestDao: CollectionsDAO =
+        daoFactory.getDAO("collectionsRestDao");
+      const collectionsGraphDao: CollectionsGraphDAO = daoFactory.getDAO(
+        "collectionsGraphDao"
       );
+      const collectionsProductService: CollectionProductService =
+        new CollectionProductService(collectionsGraphDao, collectionsRestDao);
 
-    if (result) {
-      res.status(200).send("Products successfully added to collecton");
-      return;
-    } else {
-      res.status(500).send("Error adding products to collection");
-      return;
-    }
-  } catch (err) {
-    if (err instanceof ResourceNotFound) {
-      res.status(400).send(err);
-      return;
-    } else {
-      console.log("Server error", err);
-      res.status(500).send(`Internal server error`);
-      return;
+      const result: boolean =
+        await collectionsProductService.addProductsToCollection(
+          collectionName,
+          products
+        );
+
+      if (result) {
+        res.status(200).send("Products successfully added to collecton");
+        return;
+      } else {
+        res.status(500).send("Error adding products to collection");
+        return;
+      }
+    } catch (err) {
+      if (err instanceof ResourceNotFound) {
+        res.status(400).send(err);
+        return;
+      } else {
+        console.log("Server error", err);
+        res.status(500).send(`Internal server error`);
+        return;
+      }
     }
   }
+);
+
+app.get("/api/v1/health", async (req: Request, res: Response) => {
+  res.status(200).send("Healthy");
 });
 
 app.listen(port, async () => {
