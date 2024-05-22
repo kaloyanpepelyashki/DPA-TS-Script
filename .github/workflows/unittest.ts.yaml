@@ -36,7 +36,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: {{ matrix.node-version }}
+          node-version: ${{ matrix.node-version }}
       - name: Install dependencies
         run: npm install
 
@@ -53,8 +53,9 @@ jobs:
         run: docker build -t weee-calculator-server:latest .
 
       - name: Push Docker image to DockerHub
-        run: docker tag weee-calculator-server:latest ${{ secrets.DOCKER_USERNAME }}/weee-calculator-server:latest
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/weee-calculator-server:latest
+        run: |
+          docker tag weee-calculator-server:latest ${{ secrets.DOCKER_USERNAME }}/weee-calculator-server:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/weee-calculator-server:latest
 
       - name: Deploy to Render
         run: |
