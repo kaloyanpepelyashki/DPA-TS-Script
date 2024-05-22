@@ -39,9 +39,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
         run: npm install
+        working-directory: ./Server/WEEE-Calculator-Server/
 
       - name: Compile TypeScript
         run: npm run build
+        working-directory: ./Server/WEEE-Calculator-Server/
 
       - name: Login to DockerHub
         uses: docker/login-action@v2
@@ -50,7 +52,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker build -t weee-calculator-server:latest .
+        run: docker build -t weee-calculator-server:latest -f ./Server/WEEE-Calculator-Server/Dockerfile ./Server/WEEE-Calculator-Server/
 
       - name: Push Docker image to DockerHub
         run: |
