@@ -39,9 +39,11 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
         run: npm install
+        working-directory: ./Server/WEEE-Calculator-Server/
 
       - name: Compile TypeScript
         run: npm run build
+        working-directory: ./Server/WEEE-Calculator-Server/
 
       - name: Login to DockerHub
         uses: docker/login-action@v2
