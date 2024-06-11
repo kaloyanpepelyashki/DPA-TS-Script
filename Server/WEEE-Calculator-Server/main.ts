@@ -19,11 +19,12 @@ import OrdersDAO from "./DAOs/OrdersDAO";
 import RequestUtils from "./Utilities/RequestUtils ";
 import CollectionProductService from "./ServiceLayer/Services/CollectionsProductService";
 import ResourceNotFound from "./ExceptionModels/ResourceNotFoundException";
+import Collection from "./Models/Collection";
 
 const app = express();
 app.use(express.json());
 app.use(cors());
-const port = 3000;
+const port = 4000;
 
 app.post("/api/v1/initCalculation", async (req: Request, res) => {
   try {
@@ -79,8 +80,12 @@ app.post("/api/v1/createCollection", async (req: Request, res: Response) => {
       res.status(400).send("Missing headers");
       return;
     }
-    const collections: Map<string, string> = req.body;
+    const collections = req.body;
+    const collectionsMapsArray: Array<Map<string, string>> = collections.map(
+      (obj) => new Map(Object.entries(obj))
+    );
 
+    //Initialising the DAO factory class
     const daoFactory = new DaoFactory(accessToken, hostName);
     const collectionsRestDao: CollectionsDAO =
       daoFactory.getDAO("collectionsRestDao");
@@ -88,11 +93,16 @@ app.post("/api/v1/createCollection", async (req: Request, res: Response) => {
       "collectionsGraphDao"
     );
 
+    //initialising the collectionsManager class
     const collectionsManager: CollectionsManager = new CollectionsManager(
       collectionsGraphDao,
       collectionsRestDao
     );
-    const result = await collectionsManager.createCollectionsFor(collections);
+    console.log("collections", collections);
+    const result: boolean = await collectionsManager.createCollectionsFor(
+      collectionsMapsArray
+    );
+
     if (result) {
       res.status(201).send("Collections created");
       return;
@@ -103,6 +113,48 @@ app.post("/api/v1/createCollection", async (req: Request, res: Response) => {
   } catch (e) {
     console.log("Error creating collections", e);
     res.status(500).send(`Internal server error`);
+    return;
+  }
+});
+
+app.get("/api/v1/weeeCollections/all", async (req, res) => {
+  try {
+    const { accessToken, hostName } = RequestUtils.extractHeaders(req);
+
+    if (!accessToken || !hostName) {
+      res.status(400).send("Missing headers");
+      console.log("Error, missing headers");
+      return;
+    }
+    //Initialising the DAO factory class
+    const daoFactory: DaoFactory = new DaoFactory(accessToken, hostName);
+
+    //Getting the needed DAOs
+    const collectionsRestDao: CollectionsDAO =
+      daoFactory.getDAO("collectionsRestDao");
+    const collectionsGraphDao: CollectionsGraphDAO = daoFactory.getDAO(
+      "collectionsGraphDao"
+    );
+
+    //initialising the collectionsManager class
+    const collectionsManager: CollectionsManager = new CollectionsManager(
+      collectionsGraphDao,
+      collectionsRestDao
+    );
+
+    const result: Array<Collection> =
+      await collectionsManager.getWeeeCollections();
+
+    if (result) {
+      res.send(200).send(JSON.stringify(result));
+    } else {
+      res.send(404).send("No WEEE collections found");
+    }
+  } catch (e) {
+    console.log("Error getting weee collections", e);
+    res
+      .status(500)
+      .send(`Error getting weee collections. Internal server error`);
     return;
   }
 });
@@ -132,7 +184,7 @@ app.get("/api/v1/products/all", async (req: Request, res) => {
     return;
   } catch (e) {
     console.log("Error getting all products", e);
-    res.status(500).send(`Internal server error`);
+    res.status(500).send(`Error getting all products. Internal server error`);
     return;
   }
 });

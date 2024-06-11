@@ -2,6 +2,7 @@ import { GraphqlClient, Session, Shopify } from "@shopify/shopify-api";
 import ShopifyClient from "../ShopifyClient";
 import CollectionsGraphDAO from "../../DAOs/CollectionsGraphDAO";
 import CollectionsDAO from "../../DAOs/CollectionsDAO";
+import Collection from "../../Models/Collection";
 //TODO Change the structure of the class, it needs to pass down the class tree accessToken and host
 /**
  * This class is an entry point for handling all interactions with the collections object part of the Shopify Admin API
@@ -141,10 +142,16 @@ class CollectionsManager {
    * @param {Map<string, string>} collections the key of the map is collection title and the value is the collection description
    */
   //The map should be <title, description>
-  public createCollectionsFor(collections: Map<string, string>): boolean {
+  public async createCollectionsFor(
+    collections: Array<Map<string, string>>
+  ): Promise<boolean> {
     try {
-      for (let [key, value] of collections) {
-        this.collectionsGraphDao.createCollection(key, value);
+      //Iterates over the array of maps
+      for (let i = 0; i < collections.length; i++) {
+        //Iterates over a map, part of the array of maps
+        for (let [key, value] of collections[i]) {
+          await this.collectionsGraphDao.createCollection(key, value);
+        }
       }
       return true;
     } catch (e) {
@@ -183,6 +190,29 @@ class CollectionsManager {
       return response;
     } catch (e) {
       throw new Error(e);
+    }
+  }
+  /**
+   * This method returns only the collections containing "WEEE" in their title
+   * The method will return null if no collections containing "WEEE" in their title were found
+   * @returns Array<Collection>
+   */
+  public async getWeeeCollections(): Promise<Array<Collection>> {
+    try {
+      const collectionsUnFiltered: Array<Collection> =
+        await this.collectionsGraphDao.getAllCollections();
+      const collectionsFiltered: Array<Collection> =
+        collectionsUnFiltered.filter((collection) =>
+          collection.title.includes("WEEE")
+        );
+
+      if (collectionsFiltered.length > 0) {
+        return collectionsFiltered;
+      } else {
+        return null;
+      }
+    } catch (e) {
+      throw e;
     }
   }
 
