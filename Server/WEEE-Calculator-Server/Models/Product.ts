@@ -1,3 +1,4 @@
+/** This class is a model of the Product object being fetched from Shopify API */
 class Product {
   public productId: number;
   public productTitle: string;

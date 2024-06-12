@@ -1,5 +1,5 @@
 import OrderProduct from "./OrderProduct";
-/** This class represents the order object fetched from the Shopify database*/
+/** This class represents the order object being fetched from the Shopify API */
 class Order {
   public quantity: number;
   public products: Array<OrderProduct> = [];

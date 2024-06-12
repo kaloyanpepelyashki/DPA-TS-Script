@@ -1,5 +1,5 @@
 import Product from "./Product";
-/** This class represents the product object fetched from the Shopify database
+/** This class represents the product object being fetched from the Shopify API
  * productId: number - product's id
  *  productTitle: string - product's title
  *  productVariantId: number - product's variant's id

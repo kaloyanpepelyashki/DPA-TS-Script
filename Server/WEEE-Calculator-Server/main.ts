@@ -146,14 +146,16 @@ app.get("/api/v1/weeeCollections/all", async (req, res) => {
       await collectionsManager.getWeeeCollections();
 
     if (result) {
-      res.send(200).send(JSON.stringify(result));
-    } else {
-      res.send(404).send("No WEEE collections found");
+      res.status(200).send(JSON.stringify(result));
+      return;
+    } else if (result == null) {
+      res.status(404).send("No WEEE collections found");
+      return;
     }
   } catch (e) {
     console.log("Error getting weee collections", e);
     res
-      .status(500)
+      .sendStatus(500)
       .send(`Error getting weee collections. Internal server error`);
     return;
   }

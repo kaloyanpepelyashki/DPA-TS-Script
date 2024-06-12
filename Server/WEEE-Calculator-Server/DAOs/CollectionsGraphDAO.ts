@@ -1,7 +1,5 @@
 import Collection from "../Models/Collection";
 import ShopifyClient from "../ServiceLayer/ShopifyClient";
-
-//TODO Change the structure of the class, so it can take in an accessToken and a host to be passed down to the ShopifyClient class
 class CollectionsGraphDAO extends ShopifyClient {
   protected graphQlClient;
   public constructor(accessToken: string, hostName: string) {
@@ -46,11 +44,15 @@ class CollectionsGraphDAO extends ShopifyClient {
     }
   }
 
+  /**
+   * This method queries Shopify admin and fetches all collections in vendor's store (currently to 250 collections)
+   * @returns {Array<Collection>} all collections in vendor's store as an array
+   */
   public async getAllCollections(): Promise<Array<Collection>> {
     try {
       const result = await this.graphQlClient.request(
         `query {
-        collections() {
+        collections(first: 250) {
           edges {
             node {
               id
@@ -67,16 +69,18 @@ class CollectionsGraphDAO extends ShopifyClient {
           retries: 2,
         }
       );
-
-      if (result.data.collectionCreate.userErrors.length > 0) {
-        throw new Error(
-          `Error creating collection: ${result.data.collectionCreate.userErrors}`
-        );
+      if (result.data.collections.edges.length < 0) {
+        return null;
       } else {
-        const collectionsArray = result.collections.edges.map((collection) => {
-          new Collection(collection.id, collection.title, collection.handle);
-        });
-
+        const collectionsArray = result.data.collections.edges.map(
+          (collection) => {
+            return new Collection(
+              collection.node.id,
+              collection.node.title,
+              collection.node.handle
+            );
+          }
+        );
         return collectionsArray;
       }
     } catch (e) {
