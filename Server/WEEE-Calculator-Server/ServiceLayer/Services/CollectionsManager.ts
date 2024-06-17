@@ -3,6 +3,7 @@ import ShopifyClient from "../ShopifyClient";
 import CollectionsGraphDAO from "../../DAOs/CollectionsGraphDAO";
 import CollectionsDAO from "../../DAOs/CollectionsDAO";
 import Collection from "../../Models/Collection";
+import Product from "../../Models/Product";
 class CollectionsManager {
   protected collectionsGraphDao: CollectionsGraphDAO;
   protected collectionsRestDao: CollectionsDAO;
@@ -54,16 +55,17 @@ class CollectionsManager {
   }
 
   /**
-   * This method returns a list of products belonging to a collection
+   * This method returns a list of all products belonging to a collection
    * @param collectionId
    * @returns
    */
-  public async getCollectionProducts(collectionId: number) {
+  public async getCollectionProducts(
+    collectionId: number
+  ): Promise<Array<Product>> {
     try {
       const response = await this.collectionsRestDao.getCollectionProducts(
         collectionId
       );
-
       return response;
     } catch (e) {
       throw new Error(e);

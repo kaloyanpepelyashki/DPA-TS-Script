@@ -20,6 +20,7 @@ import RequestUtils from "./Utilities/RequestUtils ";
 import CollectionProductService from "./ServiceLayer/Services/CollectionsProductService";
 import ResourceNotFound from "./ExceptionModels/ResourceNotFoundException";
 import Collection from "./Models/Collection";
+import Product from "./Models/Product";
 
 const app = express();
 app.use(express.json());
@@ -117,6 +118,10 @@ app.post("/api/v1/createCollection", async (req: Request, res: Response) => {
   }
 });
 
+/**
+ * This route is designated for getting all WEEE collections from vendor's store
+ * The route expects headers with string accessToken and string hostName
+ */
 app.get("/api/v1/weeeCollections/all", async (req, res) => {
   try {
     const { accessToken, hostName } = RequestUtils.extractHeaders(req);
@@ -157,6 +162,48 @@ app.get("/api/v1/weeeCollections/all", async (req, res) => {
     res
       .sendStatus(500)
       .send(`Error getting weee collections. Internal server error`);
+    return;
+  }
+});
+
+/**
+ * This route is designated for getting all products belonging to a collection
+ * The route expects headers with string accessToken and string hostName
+ * The route expects to get a collection id url parameter. The parameter is the id of the collection which products need to be fetched.
+ */
+app.get("/api/v1/collection/:id/products/all", async (req, res) => {
+  try {
+    const { accessToken, hostName } = RequestUtils.extractHeaders(req);
+    const collectionId = Number(req.params.id);
+
+    if (!accessToken || !hostName) {
+      res.status(400).send("Missing headers");
+      console.log("Error, missing headers");
+      return;
+    }
+
+    //Initialising the DAO factory class
+    const daoFactory: DaoFactory = new DaoFactory(accessToken, hostName);
+
+    //Getting the needed DAOs
+    const productsDAO: ProductsDAO = daoFactory.getDAO("productsDao");
+
+    //initialising the collectionsManager class
+    const productsManager: ProductsManager = new ProductsManager(productsDAO);
+
+    const result: Array<Product> =
+      await productsManager.getProductsForCollection(collectionId);
+
+    if (result) {
+      res.status(200).send(result);
+    } else if (result == null) {
+      res.status(404).send("No products were found in the collection.");
+    }
+  } catch (e) {
+    console.log("Error getting collections's all products", e);
+    res
+      .sendStatus(500)
+      .send(`Error getting collections's all products. Internal server error`);
     return;
   }
 });
@@ -240,8 +287,10 @@ app.post(
         res.status(400).send(err);
         return;
       } else {
-        console.log("Server error", err);
-        res.status(500).send(`Internal server error`);
+        console.log("Error adding productrs to collection.", err);
+        res
+          .status(500)
+          .send(`Error adding products to collection. Internal server error`);
         return;
       }
     }

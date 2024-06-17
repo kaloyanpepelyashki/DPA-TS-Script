@@ -18,19 +18,20 @@ class CollectionsGraphDAO extends ShopifyClient {
       const regEx: RegExp = new RegExp("\\s", "g");
       const collectionHandle = collectionName.replace(regEx, "-").toLowerCase();
       console.log(collectionHandle);
-      //TODO upgrade the query method to request method, according to the new API version
-      const response = await this.graphQlClient.query({
-        data: {
-          query: `query getCollectionIdFromHandle($handle: String!) {
+      //TODO test this method
+      const response = await this.graphQlClient.request(
+        `query getCollectionIdFromHandle($handle: String!) {
                   collectionByHandle(handle: $handle) {
                     id
                   }
                 }`,
+        {
           variables: {
             handle: collectionHandle,
+            retries: 2,
           },
-        },
-      });
+        }
+      );
 
       const collectionid = response.body.data.collectionByHandle.id;
       const formattedId: string = collectionid.match(/\/(\d+)$/);
