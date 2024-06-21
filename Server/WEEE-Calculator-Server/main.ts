@@ -151,9 +151,11 @@ app.get("/api/v1/weeeCollections/all", async (req, res) => {
       await collectionsManager.getWeeeCollections();
 
     if (result) {
+      console.log(result);
       res.status(200).send(JSON.stringify(result));
       return;
     } else if (result == null) {
+      console.log(result);
       res.status(404).send("No WEEE collections found");
       return;
     }

@@ -3,10 +3,23 @@ class Product {
   public productId: number;
   public productTitle: string;
   public productWeight: number;
-  constructor(productId: number, productTitle: string, productWeight: number) {
+  public productHandle: string;
+  public productImageId: number;
+  public productImageUrl: string;
+  constructor(
+    productId: number,
+    productTitle: string,
+    productWeight: number,
+    productHandle?: string,
+    productImageId?: number,
+    productImageUrl?: string
+  ) {
     this.productId = productId;
     this.productTitle = productTitle;
     this.productWeight = productWeight;
+    this.productHandle = productHandle ? productHandle : "";
+    this.productImageId = productImageId ? productImageId : 0;
+    this.productImageUrl = productImageUrl ? productImageUrl : "";
   }
 }
 export default Product;

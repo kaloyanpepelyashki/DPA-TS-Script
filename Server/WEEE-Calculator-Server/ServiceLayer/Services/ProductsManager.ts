@@ -15,14 +15,16 @@ class ProductsManager {
       const result = await this.productsDao.getProductsList("active");
 
       if (result) {
-        let productList: Array<Product> = [];
-        result.forEach((productItem) => {
-          const product = new Product(
+        let productList: Array<Product> = result.map((productItem) => {
+          console.log("product images[]", productItem.images);
+          return new Product(
             productItem.id,
             productItem.title,
-            productItem.variants[0].grams
+            productItem.variants[0].grams,
+            productItem.handle,
+            productItem.images.length > 0 ? productItem.images[0].id : 0,
+            productItem.images.length > 0 ? productItem.images[0].src : ""
           );
-          productList.push(product);
         });
         return productList;
       } else {
@@ -64,7 +66,14 @@ class ProductsManager {
       if (response) {
         const productsList: Array<Product> = response.products.map(
           (product) =>
-            new Product(product.id, product.title, product.variants[0].grams)
+            new Product(
+              product.id,
+              product.title,
+              product.variants[0].grams,
+              product.handle,
+              product.images.length > 0 ? product.images[0].id : 0,
+              product.images.length > 0 ? product.images[0].src : ""
+            )
         );
         return productsList;
       } else {

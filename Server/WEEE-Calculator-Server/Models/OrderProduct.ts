@@ -17,6 +17,7 @@ class OrderProduct extends Product {
     productWeight: number,
     productQuantity: number
   ) {
+    //The productHandle is optional, so here it's just an empty string
     super(productId, productTitle, productWeight);
     this.productVariantId = productVariantId;
     this.productQuantity = productQuantity;
