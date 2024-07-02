@@ -21,7 +21,7 @@ class OrderProduct extends Product {
     super(productId, productTitle, productWeight);
     this.productVariantId = productVariantId;
     this.productQuantity = productQuantity;
-    this.totalWeight = this.productQuantity * this.productWeight;
+    this.totalWeight = this.productQuantity * this.weight;
   }
 }
 

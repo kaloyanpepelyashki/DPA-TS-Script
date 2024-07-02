@@ -31,15 +31,15 @@ class OrdersDAO extends ShopifyClient {
     }
   }
   /** This method returns an array of OrderProduct objects, containing an array of objects, representing each order's product that fit the condition of being ordered after the specific date
-   * @param {string} minDate  (ISO 8601 format)
-   * @param {string} maxDate (ISO 8601 format)
+   * @param {string} fromDate  (ISO 8601 format)
+   * @param {string} toDate (ISO 8601 format)
    */
   public async getOrdersBetween(
-    minDate: string,
-    maxDate: string
+    fromDate: string,
+    toDate: string
   ): Promise<Array<Order> | null> {
     try {
-      const response = await this.fetchAllOrdersBetween(minDate, maxDate);
+      const response = await this.fetchAllOrdersBetween(fromDate, toDate);
 
       if (response.length > 0) {
         let ordersArray: Array<Order> = [];
@@ -72,7 +72,7 @@ class OrdersDAO extends ShopifyClient {
   }
 
   /** This method fetches all orders for the specified period */
-  protected async fetchAllOrdersBetween(minDate: string, maxDate: string) {
+  protected async fetchAllOrdersBetween(fromDate: string, toDate: string) {
     try {
       let allOrders = [];
       let sinceId = 0;
@@ -82,8 +82,8 @@ class OrdersDAO extends ShopifyClient {
           session: this.session,
           limit: 250,
           status: "closed",
-          created_at_min: minDate,
-          created_at_max: maxDate,
+          created_at_min: fromDate,
+          created_at_max: toDate,
           since_id: sinceId,
         });
         //The loop breaks when there are no more orders fetched (the orders are over for the period).

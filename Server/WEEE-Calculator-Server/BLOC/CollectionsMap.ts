@@ -42,7 +42,7 @@ class CollectionsMap {
         const productsArray: Array<number> = [];
 
         collectionProducts.forEach((product) => {
-          productsArray.push(product.productId);
+          productsArray.push(product.id);
         });
 
         this.dpaCollectionsMap.set(collectionId, productsArray);

@@ -27,14 +27,18 @@ app.use(express.json());
 app.use(cors());
 const port = 4000;
 
-app.post("/api/v1/initCalculation", async (req: Request, res) => {
+//TODO Modify the neccessary methods to also require country the report is being exporeted for
+app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
   try {
     const { accessToken, hostName } = RequestUtils.extractHeaders(req);
     console.log("accessToken: ", accessToken);
     console.log("host-name: ", hostName);
 
     if (!accessToken || !hostName) {
-      const collectionTitles: Array<string> = req.body;
+      const collectionTitles: Array<string> = req.body.collectionTitles;
+      //The start and end date of the period the report is being generated for
+      const reportFromDate: string = req.body.fromDate;
+      const reportToDate: string = req.body.toDate;
 
       if (collectionTitles.length > 0 && collectionTitles != null) {
         const daoFactory = new DaoFactory(accessToken, hostName);
@@ -52,7 +56,9 @@ app.post("/api/v1/initCalculation", async (req: Request, res) => {
         );
         const collectionsTotalWeights =
           await collectionsCalculator.calculateCollectionsTotalWeight(
-            collectionTitles
+            collectionTitles,
+            reportFromDate,
+            reportToDate
           );
 
         res

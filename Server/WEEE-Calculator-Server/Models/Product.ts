@@ -1,11 +1,11 @@
 /** This class is a model of the Product object being fetched from Shopify API */
 class Product {
-  public productId: number;
-  public productTitle: string;
-  public productWeight: number;
-  public productHandle: string;
-  public productImageId: number;
-  public productImageUrl: string;
+  public id: number;
+  public title: string;
+  public weight: number;
+  public handle: string;
+  public imageId: number;
+  public imageUrl: string;
   constructor(
     productId: number,
     productTitle: string,
@@ -14,12 +14,12 @@ class Product {
     productImageId?: number,
     productImageUrl?: string
   ) {
-    this.productId = productId;
-    this.productTitle = productTitle;
-    this.productWeight = productWeight;
-    this.productHandle = productHandle ? productHandle : "";
-    this.productImageId = productImageId ? productImageId : 0;
-    this.productImageUrl = productImageUrl ? productImageUrl : "";
+    this.id = productId;
+    this.title = productTitle;
+    this.weight = productWeight;
+    this.handle = productHandle ? productHandle : "";
+    this.imageId = productImageId ? productImageId : 0;
+    this.imageUrl = productImageUrl ? productImageUrl : "";
   }
 }
 export default Product;

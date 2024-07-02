@@ -10,13 +10,21 @@ class ProductsSoldMap {
     this.ordersDAO = ordersDao;
   }
 
-  /** This method initalizes the map and calculates the total product weight sold based on the orders */
-  protected async fetchOrders(): Promise<Order[] | null> {
+  /**
+   * This method initalizes the map and calculates the total product weight sold based on the orders
+   * @param startDate the start date of the period (ISO 8601 format)
+   * @param endDate the end date of the period (ISO 8601 format)
+   * @returns Order[] an array of all orders in the specified time frame
+   */
+  protected async fetchOrders(
+    startDate: string,
+    endDate: string
+  ): Promise<Order[] | null> {
     try {
       /** Gets all orders from shopify through the ordersDAO*/
       const orders: Order[] = await this.ordersDAO.getOrdersBetween(
-        "2023-01-01 12:00:00.000",
-        "2024-01-01 12:00:00.000"
+        startDate,
+        endDate
       );
 
       return orders;
@@ -39,22 +47,15 @@ class ProductsSoldMap {
           const productTotalWeight = product.totalWeight;
 
           //Checks if the map has this key already
-          if (this.soldProductsWeightMap.has(product.productId)) {
+          if (this.soldProductsWeightMap.has(product.id)) {
             //If tha map has the key, it re-calculates the total weight, by adding the current (in the loop) product's weight to the total weight in the map
             //The weight here is in grams
             const accumulatedWeight =
-              this.soldProductsWeightMap.get(product.productId) +
-              productTotalWeight;
-            this.soldProductsWeightMap.set(
-              product.productId,
-              accumulatedWeight
-            );
+              this.soldProductsWeightMap.get(product.id) + productTotalWeight;
+            this.soldProductsWeightMap.set(product.id, accumulatedWeight);
           } else {
             //If the product doesn't exist already, it sets it as a new product
-            this.soldProductsWeightMap.set(
-              product.productId,
-              productTotalWeight
-            );
+            this.soldProductsWeightMap.set(product.id, productTotalWeight);
           }
         });
       });
@@ -67,9 +68,12 @@ class ProductsSoldMap {
   }
 
   /** This method fetches all orders, calculates the total weight sold for each of the products and returns the data in the formm of a map */
-  public async getSoldProductsWeight(): Promise<Map<number, number> | null> {
+  public async getSoldProductsWeight(
+    startDate: string,
+    endDate: string
+  ): Promise<Map<number, number> | null> {
     try {
-      const orders = await this.fetchOrders();
+      const orders = await this.fetchOrders(startDate, endDate);
       this.calculateSoldProductsWeight(orders);
       if (this.soldProductsWeightMap.size !== 0) {
         return this.soldProductsWeightMap;
