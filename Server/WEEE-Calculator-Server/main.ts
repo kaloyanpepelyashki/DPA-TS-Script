@@ -21,6 +21,8 @@ import CollectionProductService from "./ServiceLayer/Services/CollectionsProduct
 import ResourceNotFound from "./ExceptionModels/ResourceNotFoundException";
 import Collection from "./Models/Collection";
 import Product from "./Models/Product";
+import OrdersManager from "./ServiceLayer/Services/OrdersManager";
+import OrdersGraphDAO from "./DAOs/OrdersGraphDAO";
 
 const app = express();
 app.use(express.json());
@@ -37,12 +39,20 @@ app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
     if (!accessToken || !hostName) {
       const collectionTitles: Array<string> = req.body.collectionTitles;
       //The start and end date of the period the report is being generated for
-      const reportFromDate: string = req.body.fromDate;
-      const reportToDate: string = req.body.toDate;
+      const reportFromDate: string | null = req.body.fromDate || null;
+      const reportToDate: string | null = req.body.toDate || null;
+      const reportCountry: string | null = req.body.country || null;
 
-      if (collectionTitles.length > 0 && collectionTitles != null) {
+      if (
+        collectionTitles != null &&
+        collectionTitles.length > 0 &&
+        collectionTitles != null &&
+        reportCountry != null
+      ) {
         const daoFactory = new DaoFactory(accessToken, hostName);
         const ordersDao: OrdersDAO = daoFactory.getDAO("ordersDao");
+        const ordersGraphDao: OrdersGraphDAO =
+          daoFactory.getDAO("ordersGraphDao");
         const collectionsRestDao: CollectionsDAO =
           daoFactory.getDAO("collectionsRestDao");
         const collectionsGraphDao: CollectionsGraphDAO = daoFactory.getDAO(
@@ -54,18 +64,35 @@ app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
           collectionsRestDao,
           collectionsGraphDao
         );
+        const ordersManager: OrdersManager = new OrdersManager(
+          ordersDao,
+          ordersGraphDao
+        );
+
         const collectionsTotalWeights =
           await collectionsCalculator.calculateCollectionsTotalWeight(
             collectionTitles,
             reportFromDate,
-            reportToDate
+            reportToDate,
+            reportCountry
           );
+        //Gets the vendor's store orders count for the specified period
+        const shopOrdersCount = await ordersManager.getShopOrdersCountFor(
+          reportFromDate,
+          reportToDate,
+          reportCountry
+        );
 
-        res
-          .status(200)
-          .send(JSON.stringify(Object.fromEntries(collectionsTotalWeights)));
+        if (shopOrdersCount.isSuccess && shopOrdersCount.count > 0) {
+          res.status(200).send(
+            JSON.stringify({
+              totalWeights: Object.fromEntries(collectionsTotalWeights),
+              ordersCount: shopOrdersCount.count,
+            })
+          );
+        }
       } else {
-        res.status(400);
+        res.status(400).send("Missing parameters");
       }
     } else {
       res.status(401);

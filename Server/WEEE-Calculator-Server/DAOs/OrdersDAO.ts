@@ -36,7 +36,8 @@ class OrdersDAO extends ShopifyClient {
    */
   public async getOrdersBetween(
     fromDate: string,
-    toDate: string
+    toDate: string,
+    country: string
   ): Promise<Array<Order> | null> {
     try {
       const response = await this.fetchAllOrdersBetween(fromDate, toDate);
@@ -44,7 +45,7 @@ class OrdersDAO extends ShopifyClient {
       if (response.length > 0) {
         let ordersArray: Array<Order> = [];
         response.forEach((order) => {
-          if (order.billing_address.country === "Denmark") {
+          if (order.billing_address.country === country) {
             const orderItem = new Order();
             order.line_items.forEach((lineItem) => {
               const product = new OrderProduct(
@@ -94,10 +95,32 @@ class OrdersDAO extends ShopifyClient {
         sinceId = orders.data[orders.data.length - 1].id; // Updates for next iteration the since_id to the last id from the current iteration
       }
 
-      // console.log("all Orders length:", allOrders.length);
       return allOrders;
     } catch (e) {
       console.log(`Error getting more than 250 products: ${e.message}`);
+    }
+  }
+
+  public async getOrdersCountFor(
+    fromDate: string,
+    toDate: string,
+    country: string
+  ): Promise<{ isSuccess: boolean; count: number }> {
+    try {
+      const response = await this.shopify.rest.Order.count({
+        session: this.session,
+        status: "any",
+        created_at_min: fromDate,
+        created_at_max: toDate,
+      });
+
+      if (response.status == 200) {
+        return { isSuccess: true, count: response.count };
+      }
+      return { isSuccess: false, count: null };
+    } catch (e) {
+      console.log("Error getting orders count");
+      throw e;
     }
   }
 }

@@ -32,7 +32,8 @@ class CollectionsCalaculator {
   public async calculateCollectionsTotalWeight(
     collectionsTitles: Array<string>,
     reportFromDate: string,
-    reportToDate: string
+    reportToDate: string,
+    country: string
   ): Promise<Map<string, number>> {
     this.collectionsTotalWeightMap = new CollectionsTotalWeightMap(
       this.collectionsManager,
@@ -42,7 +43,8 @@ class CollectionsCalaculator {
 
     return await this.collectionsTotalWeightMap.getCollectionsTotalWeight(
       reportFromDate,
-      reportToDate
+      reportToDate,
+      country
     );
   }
 }

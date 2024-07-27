@@ -26,12 +26,17 @@ class CollectionsTotalWeightMap {
   }
 
   //TODO This method should somehow accept startDate and endDate and pass them to the getSoldProductWeight
-  protected async initialize(reportFromDate: string, reportToDate: string) {
+  protected async initialize(
+    reportFromDate: string,
+    reportToDate: string,
+    country: string
+  ) {
     try {
       this.collections = await this.collectionsMap.getDpaCollectionsMap();
       this.soldProductsWeight = await this.productsMap.getSoldProductsWeight(
         reportFromDate,
-        reportToDate
+        reportToDate,
+        country
       );
     } catch (e) {
       console.log(
@@ -45,11 +50,12 @@ class CollectionsTotalWeightMap {
    */
   protected async calculateCollectionsTotalWeight(
     reportFromDate: string,
-    reportToDate: string
+    reportToDate: string,
+    country: string
   ) {
     try {
       let collectionsWeight = {};
-      await this.initialize(reportFromDate, reportToDate);
+      await this.initialize(reportFromDate, reportToDate, country);
 
       //Iterates over the collectionsMap to map which product belongs to each collection
       this.collections.forEach((productIdArray, collectionId) => {
@@ -125,12 +131,14 @@ class CollectionsTotalWeightMap {
    */
   public async getCollectionsTotalWeight(
     reportFromDate: string,
-    reportToDate: string
+    reportToDate: string,
+    country: string
   ): Promise<Map<string, number> | null> {
     try {
       const rawCollectionsWeight = await this.calculateCollectionsTotalWeight(
         reportFromDate,
-        reportToDate
+        reportToDate,
+        country
       );
 
       if (rawCollectionsWeight !== null) {
