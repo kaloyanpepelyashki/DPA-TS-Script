@@ -33,15 +33,14 @@ const port = 4000;
 app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
   try {
     const { accessToken, hostName } = RequestUtils.extractHeaders(req);
-    console.log("accessToken: ", accessToken);
-    console.log("host-name: ", hostName);
 
     if (!accessToken || !hostName) {
       const collectionTitles: Array<string> = req.body.collectionTitles;
       //The start and end date of the period the report is being generated for
       const reportFromDate: string | null = req.body.fromDate || null;
       const reportToDate: string | null = req.body.toDate || null;
-      const reportCountry: string | null = req.body.country || null;
+      //The country the report is being generated for
+      const reportCountry: string | null = req.body.targetCountry || null;
 
       if (
         collectionTitles != null &&
@@ -58,15 +57,15 @@ app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
         const collectionsGraphDao: CollectionsGraphDAO = daoFactory.getDAO(
           "collectionsGraphDao"
         );
-
-        const collectionsCalculator = new CollectionsCalculator(
-          ordersDao,
-          collectionsRestDao,
-          collectionsGraphDao
-        );
         const ordersManager: OrdersManager = new OrdersManager(
           ordersDao,
           ordersGraphDao
+        );
+
+        const collectionsCalculator = new CollectionsCalculator(
+          ordersManager,
+          collectionsRestDao,
+          collectionsGraphDao
         );
 
         const collectionsTotalWeights =

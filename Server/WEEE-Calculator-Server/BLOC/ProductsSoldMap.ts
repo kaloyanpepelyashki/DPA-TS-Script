@@ -1,13 +1,13 @@
 import Order from "../Models/Order";
 import OrderProduct from "../Models/OrderProduct";
-import OrdersDAO from "../DAOs/OrdersDAO";
+import OrdersManager from "../ServiceLayer/Services/OrdersManager";
 
 /** This class is a blue print of a Map, that contains both a product Id and the total weight of sold products belonging to it  */
 class ProductsSoldMap {
   protected soldProductsWeightMap: Map<number, number> = new Map();
-  protected ordersDAO: OrdersDAO;
-  constructor(ordersDao: OrdersDAO) {
-    this.ordersDAO = ordersDao;
+  protected ordersManager: OrdersManager;
+  constructor(ordersManager: OrdersManager) {
+    this.ordersManager = ordersManager;
   }
 
   /**
@@ -23,13 +23,14 @@ class ProductsSoldMap {
   ): Promise<Order[] | null> {
     try {
       /** Gets all orders from shopify through the ordersDAO*/
-      const orders: Order[] = await this.ordersDAO.getOrdersBetween(
-        startDate,
-        endDate,
-        country
-      );
+      const response: { isSuccess: boolean; orders: Array<Order> } =
+        await this.ordersManager.fetchAllOrdersFor(startDate, endDate, country);
 
-      return orders;
+      if (response.isSuccess) {
+        return response.orders;
+      }
+
+      return null;
     } catch (e) {
       console.log(`Error calculating ProductsSold Map: ${e.message}`);
       throw new Error(
@@ -77,9 +78,11 @@ class ProductsSoldMap {
   ): Promise<Map<number, number> | null> {
     try {
       const orders = await this.fetchOrders(startDate, endDate, country);
-      this.calculateSoldProductsWeight(orders);
-      if (this.soldProductsWeightMap.size !== 0) {
-        return this.soldProductsWeightMap;
+      if (orders) {
+        this.calculateSoldProductsWeight(orders);
+        if (this.soldProductsWeightMap.size !== 0) {
+          return this.soldProductsWeightMap;
+        }
       }
       return null;
     } catch (e) {

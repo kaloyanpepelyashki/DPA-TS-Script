@@ -1,7 +1,7 @@
 import CollectionsMap from "./CollectionsMap";
 import ProductsSoldMap from "./ProductsSoldMap";
 import CollectionsManager from "../ServiceLayer/Services/CollectionsManager";
-import OrdersDAO from "../DAOs/OrdersDAO";
+import OrdersManager from "../ServiceLayer/Services/OrdersManager";
 
 /** This class encapsulates the main logic for calculating the collection's total products sold in weight
  * The class proved a method for calculating the total weight for each collection
@@ -14,11 +14,11 @@ class CollectionsTotalWeightMap {
   private soldProductsWeight: Map<number, number>;
   constructor(
     collectionsManager: CollectionsManager,
-    ordersDao: OrdersDAO,
+    ordersManager: OrdersManager,
     weeeCollectionNames: Array<string>
   ) {
     this.collectionsManager = collectionsManager;
-    this.productsMap = new ProductsSoldMap(ordersDao);
+    this.productsMap = new ProductsSoldMap(ordersManager);
     this.collectionsMap = new CollectionsMap(
       weeeCollectionNames,
       this.collectionsManager
@@ -99,7 +99,8 @@ class CollectionsTotalWeightMap {
   }
 
   /**
-   *
+   * This method takes in a collection Map<number, number> where the key is collection id
+   * The methed gets for each collection its title, based on collection id
    * @param {Map<number, number>} collections
    * @returns {Map<string, number>} collectionName => weight in kilograms
    */
