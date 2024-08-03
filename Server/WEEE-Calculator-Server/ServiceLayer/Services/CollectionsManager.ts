@@ -22,24 +22,33 @@ class CollectionsManager {
   //The map should be <title, description>
   public async createCollectionsFor(
     collections: Array<Map<string, string>>
-  ): Promise<boolean> {
+  ): Promise<{ isSuccess: boolean; error?: string }> {
     try {
       //Iterates over the array of maps
       for (let i = 0; i < collections.length; i++) {
         //Iterates over a map, part of the array of maps
         for (let [key, value] of collections[i]) {
-          await this.collectionsGraphDao.createCollection(key, value);
+          let result = await this.collectionsGraphDao.createCollection(
+            key,
+            value
+          );
+
+          if (!result.isSuccess) {
+            throw new Error(result.error);
+          }
         }
       }
-      return true;
+      return { isSuccess: true };
     } catch (e) {
-      throw new Error(e);
+      return { isSuccess: false, error: e.message };
     }
   }
 
-  public async getWeeeCollectionsId(
-    collectionsNames: Array<string>
-  ): Promise<Array<number>> {
+  public async getWeeeCollectionsId(collectionsNames: Array<string>): Promise<{
+    isSuccess: boolean;
+    collectionIds: Array<number>;
+    error?: string;
+  }> {
     try {
       let collectionIds: Array<number> = [];
       for (const collectionName of collectionsNames) {
@@ -48,27 +57,31 @@ class CollectionsManager {
         collectionIds.push(Number(colId));
       }
 
-      return collectionIds;
+      return { isSuccess: true, collectionIds: collectionIds };
     } catch (e) {
-      throw new Error(e);
+      return { isSuccess: false, collectionIds: null, error: e.message };
     }
   }
 
   /**
    * This method returns a list of all products belonging to a collection
    * @param collectionId
-   * @returns
+   * @returns { isSuccess: boolean; products: Array<Product>; error?: string }
    */
   public async getCollectionProducts(
     collectionId: number
-  ): Promise<Array<Product>> {
+  ): Promise<{ isSuccess: boolean; products: Array<Product>; error?: string }> {
     try {
       const response = await this.collectionsRestDao.getCollectionProducts(
         collectionId
       );
-      return response;
+      if (response.isSuccess) {
+        return { isSuccess: true, products: response.products };
+      }
+
+      return { isSuccess: false, products: [] };
     } catch (e) {
-      throw new Error(e);
+      return { isSuccess: false, products: null, error: e.message };
     }
   }
   /**

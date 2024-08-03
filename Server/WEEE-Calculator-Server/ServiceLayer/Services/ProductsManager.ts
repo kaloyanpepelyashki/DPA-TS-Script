@@ -44,7 +44,7 @@ class ProductsManager {
   /**
    * This method queries the Shopify REST API and gets the product requested by product id
    * @param {number} productId
-   * @returns
+   * @returns { isSuccess: boolean; product: any; error?: string }
    */
   public async getProductByProductId(
     productId: number

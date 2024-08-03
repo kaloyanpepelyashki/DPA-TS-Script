@@ -23,18 +23,22 @@ class CollectionsDAO extends ShopifyClient {
   /** This method returns all products for a collection based on collection Id
    * @param {number} collectionId
    */
-  public async getCollectionProducts(collectionId: number) {
+  public async getCollectionProducts(
+    collectionId: number
+  ): Promise<{ isSuccess: boolean; products: any }> {
     try {
       const response = await this.shopify.rest.Collection.products({
         session: this.session,
         id: collectionId,
       });
 
-      return response;
+      return { isSuccess: true, products: response.products };
     } catch (e) {
       console.log(
         `Error getting products from collection ${collectionId}: ${e.message}`
       );
+
+      throw e;
     }
   }
 

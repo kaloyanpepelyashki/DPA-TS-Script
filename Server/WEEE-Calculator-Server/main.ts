@@ -138,15 +138,15 @@ app.post("/api/v1/createCollection", async (req: Request, res: Response) => {
       collectionsRestDao
     );
     console.log("collections", collections);
-    const result: boolean = await collectionsManager.createCollectionsFor(
-      collectionsMapsArray
-    );
+    const result: { isSuccess: boolean; error?: string } =
+      await collectionsManager.createCollectionsFor(collectionsMapsArray);
 
-    if (result) {
+    if (result.isSuccess) {
       res.status(201).send("Collections created");
       return;
     } else {
       res.status(500).send("Error creating collections");
+      console.log("Error creating collections", result.error);
       return;
     }
   } catch (e) {
@@ -272,10 +272,18 @@ app.get("/api/v1/products/all", async (req: Request, res) => {
     const productsDao: ProductsDAO = daoFactory.getDAO("productsDao");
 
     const productManager = new ProductsManager(productsDao);
-    const activeProducts = await productManager.getAllActiveProducts();
+    const result = await productManager.getAllActiveProducts();
 
-    console.log(activeProducts);
-    res.status(200).send(activeProducts);
+    if (result.isSuccess) {
+      res.status(200).send(result);
+      return;
+    } else if (result == null) {
+      res.status(404).send("No products were found in the collection.");
+      return;
+    } else if (result.error) {
+      res.status(500).send("Error getting all products. Internal server error");
+      return;
+    }
     return;
   } catch (e) {
     console.log("Error getting all products", e);

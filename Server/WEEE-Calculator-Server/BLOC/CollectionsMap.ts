@@ -1,4 +1,5 @@
 import CollectionsDAO from "../DAOs/CollectionsDAO";
+import Product from "../Models/Product";
 import CollectionsManager from "../ServiceLayer/Services/CollectionsManager";
 
 /** This class is a blue print of a Map, that contains both a collection Id and the products belonging to it */
@@ -19,14 +20,23 @@ class CollectionsMap {
 
   protected async initialize(): Promise<void | null> {
     try {
-      this.weeeCollectionIds =
-        await this.collectionsManager.getWeeeCollectionsId(
-          this.weeeCollectionNames
-        );
-      const result = await this.updateCollectionsMap();
-      if (result === null) {
-        return null;
+      const collectionIdsResponse: {
+        isSuccess: boolean;
+        collectionIds: Array<number>;
+        error?: string;
+      } = await this.collectionsManager.getWeeeCollectionsId(
+        this.weeeCollectionNames
+      );
+
+      if (collectionIdsResponse.isSuccess) {
+        this.weeeCollectionIds = collectionIdsResponse.collectionIds;
+        const result = await this.updateCollectionsMap();
+        if (result === null) {
+          return null;
+        }
       }
+
+      throw new Error("Error initialising collections map");
     } catch (e) {
       console.log(`Error initalising collections map: ${e.message}`);
       return null;
@@ -37,11 +47,14 @@ class CollectionsMap {
   private async updateCollectionsMap(): Promise<void | null> {
     try {
       for (const collectionId of this.weeeCollectionIds) {
-        const collectionProducts =
-          await this.collectionsManager.getCollectionProducts(collectionId);
+        const collectionProducts: {
+          isSuccess: boolean;
+          products: Array<Product>;
+          error?: string;
+        } = await this.collectionsManager.getCollectionProducts(collectionId);
         const productsArray: Array<number> = [];
 
-        collectionProducts.forEach((product) => {
+        collectionProducts.products.forEach((product) => {
           productsArray.push(product.id);
         });
 
@@ -49,7 +62,7 @@ class CollectionsMap {
       }
     } catch (e) {
       console.log(`Error composing collections map: ${e.message}`);
-      return null;
+      throw e;
     }
   }
 
@@ -60,7 +73,7 @@ class CollectionsMap {
       return this.dpaCollectionsMap;
     } catch (e) {
       console.log(`Error getting DPA collections: ${e.message}`);
-      return null;
+      throw e;
     }
   }
 }

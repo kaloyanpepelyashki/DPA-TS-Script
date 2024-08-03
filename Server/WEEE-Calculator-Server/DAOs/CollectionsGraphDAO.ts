@@ -98,7 +98,7 @@ class CollectionsGraphDAO extends ShopifyClient {
   public async createCollection(
     collectionName: string,
     collectionDescription: string
-  ): Promise<boolean> {
+  ): Promise<{ isSuccess: boolean; error?: string }> {
     try {
       const result = await this.graphQlClient.request(
         `mutation CollectionCreate($input: CollectionInput!) {
@@ -144,15 +144,16 @@ class CollectionsGraphDAO extends ShopifyClient {
       );
 
       if (result.data.collectionCreate.userErrors.length > 0) {
-        throw new Error(
-          `Error creating collection: ${result.data.collectionCreate.userErrors}`
-        );
+        return {
+          isSuccess: false,
+          error: `Error creating collection: ${result.data.collectionCreate.userErrors}`,
+        };
       } else {
-        return true;
+        return { isSuccess: true };
       }
     } catch (e: any) {
       console.log(`Error creating collection: ${e}`);
-      throw new Error(`Error creating collection: ${e.message}`);
+      throw e;
     }
   }
 
