@@ -38,13 +38,20 @@ class OrdersDAO extends ShopifyClient {
     fromDate: string,
     toDate: string,
     country: string
-  ): Promise<Array<Order> | null> {
+  ): Promise<{ isSuccess: boolean; orders: Array<Order> | null }> {
     try {
-      const response = await this.fetchAllOrdersBetween(fromDate, toDate);
+      const response: {
+        isSuccess: boolean;
+        allOrders: any[] | null;
+      } = await this.fetchAllOrdersBetween(fromDate, toDate);
 
-      if (response.length > 0) {
+      if (!response.isSuccess) {
+        return { isSuccess: false, orders: null };
+      }
+
+      if (response.isSuccess && response.allOrders.length > 0) {
         let ordersArray: Array<Order> = [];
-        response.forEach((order) => {
+        response.allOrders.forEach((order) => {
           if (order.billing_address.country === country) {
             const orderItem = new Order();
             order.line_items.forEach((lineItem) => {
@@ -63,17 +70,21 @@ class OrdersDAO extends ShopifyClient {
           }
         });
 
-        return ordersArray;
+        return { isSuccess: true, orders: ordersArray };
       }
-      return null;
+
+      return { isSuccess: false, orders: null };
     } catch (e) {
       console.log(`Error retreiving products: ${e}`);
-      return null;
+      throw e;
     }
   }
 
   /** This method fetches all orders for the specified period */
-  protected async fetchAllOrdersBetween(fromDate: string, toDate: string) {
+  protected async fetchAllOrdersBetween(
+    fromDate: string,
+    toDate: string
+  ): Promise<{ isSuccess: boolean; allOrders: any[] | null }> {
     try {
       let allOrders = [];
       let sinceId = 0;
@@ -95,9 +106,14 @@ class OrdersDAO extends ShopifyClient {
         sinceId = orders.data[orders.data.length - 1].id; // Updates for next iteration the since_id to the last id from the current iteration
       }
 
-      return allOrders;
+      if (allOrders.length > 0) {
+        return { isSuccess: true, allOrders: allOrders };
+      }
+
+      return { isSuccess: false, allOrders: null };
     } catch (e) {
       console.log(`Error getting more than 250 products: ${e.message}`);
+      throw e;
     }
   }
 

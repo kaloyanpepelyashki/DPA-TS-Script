@@ -32,72 +32,78 @@ const port = 4000;
 //TODO Modify the neccessary methods to also require country the report is being exporeted for
 app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
   try {
+    console.log("Request in /initCalculation received");
     const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
     if (!accessToken || !hostName) {
-      const collectionTitles: Array<string> = req.body.collectionTitles;
-      //The start and end date of the period the report is being generated for
-      const reportFromDate: string | null = req.body.fromDate || null;
-      const reportToDate: string | null = req.body.toDate || null;
-      //The country the report is being generated for
-      const reportCountry: string | null = req.body.targetCountry || null;
+      res.status(400).send("Missing headers");
+      console.log("Error, missing headers");
+      return;
+    }
+    const collectionTitles: Array<string> = req.body.collectionTitles;
+    //The start and end date of the period the report is being generated for
+    const reportFromDate: string | null = req.body.fromDate || null;
+    const reportToDate: string | null = req.body.toDate || null;
+    //The country the report is being generated for
+    const reportCountry: string | null = req.body.targetCountry || null;
 
-      if (
-        collectionTitles != null &&
-        collectionTitles.length > 0 &&
-        collectionTitles != null &&
-        reportCountry != null
-      ) {
-        const daoFactory = new DaoFactory(accessToken, hostName);
-        const ordersDao: OrdersDAO = daoFactory.getDAO("ordersDao");
-        const ordersGraphDao: OrdersGraphDAO =
-          daoFactory.getDAO("ordersGraphDao");
-        const collectionsRestDao: CollectionsDAO =
-          daoFactory.getDAO("collectionsRestDao");
-        const collectionsGraphDao: CollectionsGraphDAO = daoFactory.getDAO(
-          "collectionsGraphDao"
-        );
-        const ordersManager: OrdersManager = new OrdersManager(
-          ordersDao,
-          ordersGraphDao
-        );
+    if (
+      collectionTitles != null &&
+      collectionTitles.length > 0 &&
+      collectionTitles != null &&
+      reportCountry != null
+    ) {
+      console.log("Report requested");
+      const daoFactory = new DaoFactory(accessToken, hostName);
+      const ordersDao: OrdersDAO = daoFactory.getDAO("ordersDao");
+      const ordersGraphDao: OrdersGraphDAO =
+        daoFactory.getDAO("ordersGraphDao");
+      const collectionsRestDao: CollectionsDAO =
+        daoFactory.getDAO("collectionsRestDao");
+      const collectionsGraphDao: CollectionsGraphDAO = daoFactory.getDAO(
+        "collectionsGraphDao"
+      );
+      const ordersManager: OrdersManager = new OrdersManager(
+        ordersDao,
+        ordersGraphDao
+      );
 
-        const collectionsCalculator = new CollectionsCalculator(
-          ordersManager,
-          collectionsRestDao,
-          collectionsGraphDao
-        );
+      const collectionsCalculator = new CollectionsCalculator(
+        ordersManager,
+        collectionsRestDao,
+        collectionsGraphDao
+      );
 
-        const collectionsTotalWeights =
-          await collectionsCalculator.calculateCollectionsTotalWeight(
-            collectionTitles,
-            reportFromDate,
-            reportToDate,
-            reportCountry
-          );
-        //Gets the vendor's store orders count for the specified period
-        const shopOrdersCount = await ordersManager.getShopOrdersCountFor(
+      const collectionsTotalWeights =
+        await collectionsCalculator.calculateCollectionsTotalWeight(
+          collectionTitles,
           reportFromDate,
           reportToDate,
           reportCountry
         );
+      //Gets the vendor's store orders count for the specified period
+      const shopOrdersCount = await ordersManager.getShopOrdersCountFor(
+        reportFromDate,
+        reportToDate,
+        reportCountry
+      );
 
-        if (shopOrdersCount.isSuccess && shopOrdersCount.count > 0) {
-          res.status(200).send(
-            JSON.stringify({
-              totalWeights: Object.fromEntries(collectionsTotalWeights),
-              ordersCount: shopOrdersCount.count,
-            })
-          );
-        }
-      } else {
-        res.status(400).send("Missing parameters");
+      if (shopOrdersCount.isSuccess /*&& shopOrdersCount.count > 0*/) {
+        console.log("Report sent");
+        return res.status(200).send(
+          JSON.stringify({
+            totalWeights: Object.fromEntries(collectionsTotalWeights),
+            ordersCount: shopOrdersCount.count,
+          })
+        );
       }
     } else {
-      res.status(401);
+      console.log("Error, missing parameters");
+      return res.status(400).send("Missing parameters");
     }
   } catch (e) {
-    res.status(500).send(`Internal server error ${e}`);
+    console.log("Internal server error when genrating report");
+    return res.status(500).send(`Internal server error ${e}`);
   }
 });
 
@@ -225,13 +231,19 @@ app.get("/api/v1/collection/:id/products/all", async (req, res) => {
     //initialising the collectionsManager class
     const productsManager: ProductsManager = new ProductsManager(productsDAO);
 
-    const result: Array<Product> =
+    const result: { isSuccess: boolean; products: Product[]; error?: string } =
       await productsManager.getProductsForCollection(collectionId);
 
-    if (result) {
+    if (result.isSuccess) {
       res.status(200).send(result);
     } else if (result == null) {
       res.status(404).send("No products were found in the collection.");
+    } else if (result.error) {
+      res
+        .status(500)
+        .send(
+          "Error getting collections's all products. Internal server error"
+        );
     }
   } catch (e) {
     console.log("Error getting collections's all products", e);

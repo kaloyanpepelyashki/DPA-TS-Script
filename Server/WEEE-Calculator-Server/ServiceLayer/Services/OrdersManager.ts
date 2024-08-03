@@ -16,24 +16,27 @@ class OrdersManager {
     fromDate: string,
     toDate: string,
     country: string
-  ): Promise<{ isSuccess: boolean; orders: Array<Order> }> {
-    const response: Array<Order> | null = await this.ordersDao.getOrdersBetween(
-      fromDate,
-      toDate,
-      country
-    );
+  ): Promise<{ isSuccess: boolean; orders: Array<Order>; error?: string }> {
+    try {
+      const response: { isSuccess: boolean; orders: Array<Order> | null } =
+        await this.ordersDao.getOrdersBetween(fromDate, toDate, country);
 
-    if (response != null) {
-      return { isSuccess: true, orders: response };
+      if (response != null) {
+        return { isSuccess: true, orders: response.orders };
+      }
+
+      return { isSuccess: false, orders: [] };
+    } catch (e) {
+      console.log("Error in OrdersManager: Error fetching orders: ", e);
+      return { isSuccess: false, orders: [], error: e.message };
     }
-
-    return { isSuccess: false, orders: null };
   }
+
   public async getShopOrdersCountFor(
     fromDate: string,
     toDate: string,
     country: string
-  ): Promise<{ isSuccess: boolean; count: number }> {
+  ): Promise<{ isSuccess: boolean; count: number; error?: string }> {
     try {
       const response = await this.ordersGraphDao.getOrdersCountFor(
         fromDate,
@@ -47,7 +50,8 @@ class OrdersManager {
 
       return { isSuccess: false, count: 0 };
     } catch (e) {
-      throw e;
+      console.log("Error in OrdersManager: Error getting orders count: ", e);
+      return { isSuccess: false, count: 0, error: e.message };
     }
   }
 }

@@ -11,7 +11,9 @@ class ProductsDAO extends ShopifyClient {
    * @param collectionId:number
    * @returns {Array<Product>} and array of products belonging to a collection
    */
-  public async getProductByCollectionId(collectionId: number) {
+  public async getProductByCollectionId(
+    collectionId: number
+  ): Promise<{ isSuccess: boolean; products: any }> {
     try {
       const response = await this.shopify.rest.Product.all({
         session: this.session,
@@ -19,9 +21,9 @@ class ProductsDAO extends ShopifyClient {
       });
 
       if (response) {
-        return response;
+        return { isSuccess: true, products: response };
       }
-      return null;
+      return { isSuccess: false, products: [] };
     } catch (e) {
       console.log(
         `Error getting products from collection ${collectionId}: ${e.message}`
@@ -31,14 +33,20 @@ class ProductsDAO extends ShopifyClient {
     }
   }
 
-  public async getProductByProductId(productId: number) {
+  public async getProductByProductId(
+    productId: number
+  ): Promise<{ isSuccess: boolean; product: any }> {
     try {
       const response = await this.shopify.rest.Product.find({
         session: this.session,
         id: productId,
       });
 
-      return response;
+      if (response.length > 0) {
+        return { isSuccess: true, product: response };
+      }
+
+      return { isSuccess: false, product: null };
     } catch (e) {
       console.log(`Error getting product by id ${productId}: ${e.message}`);
       throw e;
@@ -64,7 +72,9 @@ class ProductsDAO extends ShopifyClient {
    * @param status
    * @returns all products from the vendor's store based on the status
    */
-  public async getProductsList(status?: string) {
+  public async getProductsList(
+    status?: string
+  ): Promise<{ isSuccess: boolean; products: any }> {
     try {
       let allProducts = [];
       let sinceId = 0;
@@ -84,9 +94,14 @@ class ProductsDAO extends ShopifyClient {
         sinceId = products.data[products.data.length - 1].id; // Updates for next iteration the since_id to the last id from the current iteration
       }
 
-      return allProducts;
+      if (allProducts.length != 0) {
+        return { isSuccess: true, products: allProducts };
+      }
+
+      return { isSuccess: false, products: [] };
     } catch (e) {
       console.log(`Error getting products from : ${e.message}`);
+      throw e;
     }
   }
 }

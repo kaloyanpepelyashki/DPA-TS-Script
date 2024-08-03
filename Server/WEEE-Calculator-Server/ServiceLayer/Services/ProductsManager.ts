@@ -10,12 +10,17 @@ class ProductsManager {
    * This method queries the Shopify REST API and returns all active products in the vendors's store
    * @returns {Array<Product>} An array of all active products
    */
-  public async getAllActiveProducts(): Promise<Array<Product>> {
+  public async getAllActiveProducts(): Promise<{
+    isSuccess: boolean;
+    products: Array<Product>;
+    error?: string;
+  }> {
     try {
-      const result = await this.productsDao.getProductsList("active");
+      const result: { isSuccess: boolean; products: any } =
+        await this.productsDao.getProductsList("active");
 
-      if (result) {
-        let productList: Array<Product> = result.map((productItem) => {
+      if (result.isSuccess) {
+        let productList: Array<Product> = result.products.map((productItem) => {
           console.log("product images[]", productItem.images);
           return new Product(
             productItem.id,
@@ -26,12 +31,13 @@ class ProductsManager {
             productItem.images.length > 0 ? productItem.images[0].src : ""
           );
         });
-        return productList;
+        return { isSuccess: true, products: productList };
       } else {
-        return null;
+        return { isSuccess: false, products: [] };
       }
     } catch (e) {
-      throw e;
+      console.log(e);
+      return { isSuccess: false, products: [], error: e.message };
     }
   }
 
@@ -40,30 +46,40 @@ class ProductsManager {
    * @param {number} productId
    * @returns
    */
-  public async getProductByProductId(productId: number) {
+  public async getProductByProductId(
+    productId: number
+  ): Promise<{ isSuccess: boolean; product: any; error?: string }> {
     try {
       const result = await this.productsDao.getProductByProductId(productId);
 
-      return result;
+      if (result.isSuccess) {
+        return { isSuccess: true, product: result.product };
+      }
+
+      return {
+        isSuccess: false,
+        product: null,
+        error: "Product was not found",
+      };
     } catch (e) {
-      throw e;
+      console.log("Error in ProductsManager. Error getting product by id: ", e);
+      return { isSuccess: false, product: null, error: e.message };
     }
   }
 
   /** This method queries the Shopify REST API and gets a list of produduct, belonging to a collection
    * The method requires a collection id of the collection which products are to be fetched
    * @param {number} collectionId
-   * @returns {Array<Product>} An array of all products belonging to the collection
+   * @returns { isSuccess: boolean; products: Array<Product>; error?: string } Success status, an array of all products belonging to the collection and an error mmessage if any
    */
   public async getProductsForCollection(
     collectionId: number
-  ): Promise<Array<Product>> {
+  ): Promise<{ isSuccess: boolean; products: Array<Product>; error?: string }> {
     try {
-      const response = await this.productsDao.getProductByCollectionId(
-        collectionId
-      );
+      const response: { isSuccess: boolean; products: any } =
+        await this.productsDao.getProductByCollectionId(collectionId);
 
-      if (response) {
+      if (response.isSuccess) {
         const productsList: Array<Product> = response.products.map(
           (product) =>
             new Product(
@@ -75,12 +91,17 @@ class ProductsManager {
               product.images.length > 0 ? product.images[0].src : ""
             )
         );
-        return productsList;
+        return { isSuccess: true, products: productsList };
       } else {
-        return null;
+        return {
+          isSuccess: false,
+          products: [],
+          error: `No products were found for collection: ${collectionId}`,
+        };
       }
     } catch (e) {
-      throw e;
+      console.log(e);
+      return { isSuccess: false, products: [], error: e.message };
     }
   }
 }
