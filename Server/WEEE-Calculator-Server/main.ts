@@ -82,11 +82,20 @@ app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
           reportCountry
         );
       //Gets the vendor's store orders count for the specified period
-      const shopOrdersCount = await ordersManager.getShopOrdersCountFor(
+      const shopOrdersCount: {
+        isSuccess: boolean;
+        count: number;
+        error?: string;
+      } = await ordersManager.getShopOrdersCountFor(
         reportFromDate,
         reportToDate,
         reportCountry
       );
+
+      //TODO Implement proper error handling
+      // if(shopOrdersCount.error) {
+
+      // }
 
       if (shopOrdersCount.isSuccess /*&& shopOrdersCount.count > 0*/) {
         console.log("Report sent");
@@ -141,6 +150,12 @@ app.post("/api/v1/createCollection", async (req: Request, res: Response) => {
     const result: { isSuccess: boolean; error?: string } =
       await collectionsManager.createCollectionsFor(collectionsMapsArray);
 
+    if (result.error) {
+      console.log("Error creating collections", result.error);
+      res.status(500).send("Error creating collections");
+      return;
+    }
+
     if (result.isSuccess) {
       res.status(201).send("Collections created");
       return;
@@ -185,23 +200,35 @@ app.get("/api/v1/weeeCollections/all", async (req, res) => {
       collectionsRestDao
     );
 
-    const result: Array<Collection> =
-      await collectionsManager.getWeeeCollections();
+    const result: {
+      isSuccess: boolean;
+      collections: Array<Collection>;
+      error?: string;
+    } = await collectionsManager.getWeeeCollections();
 
-    if (result) {
-      console.log(result);
-      res.status(200).send(JSON.stringify(result));
+    if (result.error) {
+      console.log("Error getting all weee collections: ", result.error);
+      res
+        .status(500)
+        .send(`Error getting weee collections. Internal server error`);
       return;
-    } else if (result == null) {
-      console.log(result);
-      res.status(404).send("No WEEE collections found");
+    }
+
+    if (result.isSuccess && result.collections.length > 0) {
+      if (result.collections == null) {
+        console.log("No WEEE collections found");
+        res.status(404).send("No WEEE collections found");
+        return;
+      }
+
+      res.status(200).send(JSON.stringify(result.collections));
       return;
     }
   } catch (e) {
-    console.log("Error getting weee collections", e);
+    console.log("Error getting all weee collections: ", e);
     res
-      .sendStatus(500)
-      .send(`Error getting weee collections. Internal server error`);
+      .status(500)
+      .send(`Error getting all weee collections. Internal server error`);
     return;
   }
 });
@@ -234,19 +261,29 @@ app.get("/api/v1/collection/:id/products/all", async (req, res) => {
     const result: { isSuccess: boolean; products: Product[]; error?: string } =
       await productsManager.getProductsForCollection(collectionId);
 
-    if (result.isSuccess) {
-      res.status(200).send(result);
-    } else if (result == null) {
-      res.status(404).send("No products were found in the collection.");
-    } else if (result.error) {
+    if (result.error) {
+      console.log("Error getting products for collection: ", result.error);
       res
         .status(500)
         .send(
           "Error getting collections's all products. Internal server error"
         );
     }
+
+    if (result.isSuccess) {
+      if (result.products.length == 0) {
+        res
+          .status(404)
+          .send(
+            `No products were found that belong to collection ${collectionId} in vendors store.`
+          );
+        return;
+      }
+      res.status(200).send(result.products);
+      return;
+    }
   } catch (e) {
-    console.log("Error getting collections's all products", e);
+    console.log("Error getting products for collection: ", e.message);
     res
       .sendStatus(500)
       .send(`Error getting collections's all products. Internal server error`);
@@ -274,17 +311,22 @@ app.get("/api/v1/products/all", async (req: Request, res) => {
     const productManager = new ProductsManager(productsDao);
     const result = await productManager.getAllActiveProducts();
 
-    if (result.isSuccess) {
-      res.status(200).send(result);
-      return;
-    } else if (result == null) {
-      res.status(404).send("No products were found in the collection.");
-      return;
-    } else if (result.error) {
+    if (result.error) {
       res.status(500).send("Error getting all products. Internal server error");
       return;
     }
-    return;
+
+    if (result.isSuccess) {
+      if (result.products.length == 0) {
+        res.status(404).send("No products were found in vendors store.");
+        return;
+      }
+      res.status(200).send(result.products);
+      return;
+    } else {
+      res.status(500).send("Error getting all products. Internal server error");
+      return;
+    }
   } catch (e) {
     console.log("Error getting all products", e);
     res.status(500).send(`Error getting all products. Internal server error`);

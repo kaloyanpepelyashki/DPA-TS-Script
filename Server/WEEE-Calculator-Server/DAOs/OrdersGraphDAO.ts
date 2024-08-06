@@ -18,8 +18,7 @@ class OrdersGraphDAO extends ShopifyClient {
   ): Promise<{ isSuccess: boolean; count: number }> {
     try {
       const response = await this.graphQlClient.request(
-        //TODO Test out if this query works correctly.
-        `query ($country: String, $minDate: DateTime, $maxDate: DateTime) {
+        `query ($country: String!, $minDate: DateTime, $maxDate: DateTime) {
           orders(query: "financial_status:paid, created_at:>= $minDate, created_at:<= $maxDate, shipping_address.country: $country") {
             edges {
               node {

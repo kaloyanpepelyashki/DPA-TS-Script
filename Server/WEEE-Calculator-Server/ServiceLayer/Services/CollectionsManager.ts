@@ -89,11 +89,14 @@ class CollectionsManager {
    * The method will return null if no collections containing "WEEE" in their title were found
    * @returns {Array<Collection>} All WEEE collections in vendor's store
    */
-  public async getWeeeCollections(): Promise<Array<Collection>> {
+  public async getWeeeCollections(): Promise<{
+    isSuccess: boolean;
+    collections: Array<Collection>;
+    error?: string;
+  }> {
     try {
       const collectionsUnFiltered: Array<Collection> =
         await this.collectionsGraphDao.getAllCollections();
-      console.log("collections un filtered: ", collectionsUnFiltered);
       if (collectionsUnFiltered != null) {
         const collectionsFiltered: Array<Collection> =
           collectionsUnFiltered.filter((collection) =>
@@ -101,15 +104,19 @@ class CollectionsManager {
           );
 
         if (collectionsFiltered.length > 0) {
-          return collectionsFiltered;
+          return { isSuccess: true, collections: collectionsFiltered };
         } else {
-          return null;
+          return { isSuccess: true, collections: [] };
         }
       }
 
-      return null;
+      return {
+        isSuccess: false,
+        collections: [],
+        error: "No collections found",
+      };
     } catch (e) {
-      throw e;
+      return { isSuccess: false, collections: [], error: e.message };
     }
   }
 
