@@ -92,16 +92,18 @@ app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
         reportCountry
       );
 
-      //TODO Implement proper error handling
-      // if(shopOrdersCount.error) {
+      if (shopOrdersCount.error || collectionsTotalWeights.error) {
+        console.log("Internal server error when genrating report");
+        return res.status(500).send(`Internal server error`);
+      }
 
-      // }
-
-      if (shopOrdersCount.isSuccess /*&& shopOrdersCount.count > 0*/) {
+      if (shopOrdersCount.isSuccess && collectionsTotalWeights.isSuccess) {
         console.log("Report sent");
         return res.status(200).send(
           JSON.stringify({
-            totalWeights: Object.fromEntries(collectionsTotalWeights),
+            totalWeights: Object.fromEntries(
+              collectionsTotalWeights.collectionsTotalWeights
+            ),
             ordersCount: shopOrdersCount.count,
           })
         );
@@ -112,7 +114,7 @@ app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
     }
   } catch (e) {
     console.log("Internal server error when genrating report");
-    return res.status(500).send(`Internal server error ${e}`);
+    return res.status(500).send(`Internal server error`);
   }
 });
 

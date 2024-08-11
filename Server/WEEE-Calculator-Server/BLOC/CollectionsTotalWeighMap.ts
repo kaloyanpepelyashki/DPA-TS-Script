@@ -128,13 +128,17 @@ class CollectionsTotalWeightMap {
    * This method returns a Map, encapsulating the collections weight in kilograms.
    * @param reportFromDate (ISO 8601 format)
    * @param reportToDate (ISO 8601 format)
-   * @returns collectionsTotalWeightMap
+   * @returns {isSuccess: boolean, collectionsTotalWeights: Map<string, number>, error?: string } An isSuccess property, which will be true, if the opperations was a success, collectionsTotalWeights which is the payload returned and optional error
    */
   public async getCollectionsTotalWeight(
     reportFromDate: string,
     reportToDate: string,
     country: string
-  ): Promise<Map<string, number> | null> {
+  ): Promise<{
+    isSuccess: boolean;
+    collectionsTotalWeights: Map<string, number>;
+    error?: string;
+  }> {
     try {
       const rawCollectionsWeight = await this.calculateCollectionsTotalWeight(
         reportFromDate,
@@ -143,20 +147,30 @@ class CollectionsTotalWeightMap {
       );
 
       if (rawCollectionsWeight !== null) {
+        //Converts weights from grams to kilograms
         let collectionsTotalWeightMap: Map<number, number> =
           this.convertCollectionsUnit(rawCollectionsWeight);
 
         if (collectionsTotalWeightMap.size != null) {
-          return this.convertIdToTitle(collectionsTotalWeightMap);
+          //For each key of the map, converts it from collection id to title
+          const namedMap = await this.convertIdToTitle(
+            collectionsTotalWeightMap
+          );
+
+          return { isSuccess: true, collectionsTotalWeights: namedMap };
         }
       } else {
-        return null;
+        return { isSuccess: false, collectionsTotalWeights: null, error: "" };
       }
     } catch (e) {
       console.log(
         `Error getting the total weight for collections: ${e.message}`
       );
-      return null;
+      return {
+        isSuccess: false,
+        collectionsTotalWeights: null,
+        error: e.message,
+      };
     }
   }
 }

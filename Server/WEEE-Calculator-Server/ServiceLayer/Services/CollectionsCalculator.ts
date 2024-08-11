@@ -36,18 +36,46 @@ class CollectionsCalaculator {
     reportFromDate: string,
     reportToDate: string,
     country: string
-  ): Promise<Map<string, number>> {
-    this.collectionsTotalWeightMap = new CollectionsTotalWeightMap(
-      this.collectionsManager,
-      this.ordersManager,
-      collectionsTitles
-    );
+  ): Promise<{
+    isSuccess: boolean;
+    collectionsTotalWeights: Map<string, number>;
+    error?: string;
+  }> {
+    try {
+      this.collectionsTotalWeightMap = new CollectionsTotalWeightMap(
+        this.collectionsManager,
+        this.ordersManager,
+        collectionsTitles
+      );
 
-    return await this.collectionsTotalWeightMap.getCollectionsTotalWeight(
-      reportFromDate,
-      reportToDate,
-      country
-    );
+      const collectionsTotalWeights =
+        await this.collectionsTotalWeightMap.getCollectionsTotalWeight(
+          reportFromDate,
+          reportToDate,
+          country
+        );
+
+      if (collectionsTotalWeights.isSuccess) {
+        return {
+          isSuccess: true,
+          collectionsTotalWeights:
+            collectionsTotalWeights.collectionsTotalWeights,
+        };
+      }
+
+      return {
+        isSuccess: true,
+        collectionsTotalWeights: null,
+        error: "Could not get collections total weights",
+      };
+    } catch (e) {
+      console.log("Error calculating collections total weight: ", e);
+      return {
+        isSuccess: false,
+        collectionsTotalWeights: null,
+        error: e.message,
+      };
+    }
   }
 }
 
