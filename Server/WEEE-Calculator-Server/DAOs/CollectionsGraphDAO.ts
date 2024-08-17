@@ -216,6 +216,58 @@ class CollectionsGraphDAO extends ShopifyClient {
       throw new Error(`${e}`);
     }
   }
+
+  /**
+   * This method pushes an array of product id's to a collection, usng the graphQl Shopify API
+   * @param collectionId
+   * @param products
+   * @returns {isSuccess: boolean, error?: string} isSuccess
+   */
+  public async removeProductsFromCollection(
+    collectionId: string,
+    products: Array<string>
+  ): Promise<{
+    isSuccess: boolean;
+  }> {
+    try {
+      let productsArray: Array<string> = [];
+
+      //Note the id's need to be pushed to an array, and afterwards the array is being pushed to the object being sent to the Shopify db
+      products.forEach((product) => {
+        productsArray.push(`gid://shopify/Product/${product}`);
+      });
+
+      const result = await this.graphQlClient.request(
+        `mutation collectionRemoveProducts($id: ID!, $productIds: [ID!]!) {
+      collectionRemoveProducts(id: $id, productIds: $productIds) {
+        job {
+          done
+          id
+        }
+        userErrors {
+          field
+          message
+        }
+      }
+    }`,
+        {
+          variables: {
+            id: `gid://shopify/Collection/${collectionId}`,
+            productIds: productsArray,
+          },
+        }
+      );
+      if (!result.body.data.collection) {
+        throw new Error(
+          "Error in CollectionsGraphDAO. Error removing products from collection: API did not return the expected response"
+        );
+      }
+
+      return { isSuccess: true };
+    } catch (e) {
+      throw e;
+    }
+  }
 }
 
 export default CollectionsGraphDAO;

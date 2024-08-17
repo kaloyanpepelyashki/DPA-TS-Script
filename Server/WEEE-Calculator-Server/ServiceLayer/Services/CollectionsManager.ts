@@ -152,6 +152,7 @@ class CollectionsManager {
    * @param products
    * @returns
    */
+  //TODO Modify the return type of this method
   public async addProductsToCollection(
     collectionId: string,
     products: Array<string>
@@ -167,6 +168,30 @@ class CollectionsManager {
       throw new Error(
         `Error adding products to collection ${collectionId}: ${e.message}`
       );
+    }
+  }
+
+  public async removeProductsFromCollection(
+    collectionId: string,
+    products: Array<string>
+  ): Promise<{ isSuccess: boolean; error?: string }> {
+    try {
+      const response =
+        await this.collectionsGraphDao.removeProductsFromCollection(
+          collectionId,
+          products
+        );
+
+      if (response.isSuccess) {
+        return { isSuccess: true };
+      }
+
+      return {
+        isSuccess: false,
+        error: "Error removing products from a collection",
+      };
+    } catch (e) {
+      return { isSuccess: false, error: e.message };
     }
   }
 }

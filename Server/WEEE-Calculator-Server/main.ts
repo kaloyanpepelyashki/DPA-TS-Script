@@ -374,10 +374,14 @@ app.post(
         );
 
       if (result) {
-        res.status(200).send("Products successfully added to collecton");
+        res
+          .status(200)
+          .send({ message: "Products successfully added to collecton" });
         return;
       } else {
-        res.status(500).send("Error adding products to collection");
+        res
+          .status(500)
+          .send({ message: "Error adding products to collection" });
         return;
       }
     } catch (err) {
