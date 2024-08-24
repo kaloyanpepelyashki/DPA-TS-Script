@@ -351,12 +351,16 @@ app.post(
       const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
       if (!accessToken || !hostName) {
-        res.status(400).send("Missing headers");
+        res.status(400).send({ message: "Missing headers" });
         return;
       }
 
       const collectionName: string = req.body.collection;
       const products: Array<string> = req.body.products;
+      if (typeof collectionName !== "string" || !Array.isArray(products)) {
+        res.status(400).send({ message: "Prameters are not of correct type" });
+        return;
+      }
 
       const daoFactory: DaoFactory = new DaoFactory(accessToken, hostName);
       const collectionsRestDao: CollectionsDAO =
@@ -393,6 +397,79 @@ app.post(
         res
           .status(500)
           .send(`Error adding products to collection. Internal server error`);
+        return;
+      }
+    }
+  }
+);
+
+/**
+ * This route is designated for adding products to a collection
+ * The route expects headers with string accessToken and string hostName, and a JSON body with:
+ * {
+ *   "collection": "collectionName",
+ *   "products": ["productId", "productId", ...]
+ * }
+ */
+app.post(
+  "/api/v1/removeProductsFromCollection",
+  async (req: Request, res: Response) => {
+    try {
+      const { accessToken, hostName } = RequestUtils.extractHeaders(req);
+
+      if (!accessToken || !hostName) {
+        res.status(400).send("Missing headers");
+        return;
+      }
+
+      const collectionName = req.body.collection;
+      const products = req.body.products;
+
+      if (typeof collectionName !== "string" || !Array.isArray(products)) {
+        res.status(400).send("Prameters are not of correct type");
+        return;
+      }
+
+      const daoFactory: DaoFactory = new DaoFactory(accessToken, hostName);
+      const collectionsRestDao: CollectionsDAO =
+        daoFactory.getDAO("collectionsRestDao");
+      const collectionsGraphDao: CollectionsGraphDAO = daoFactory.getDAO(
+        "collectionsGraphDao"
+      );
+      const collectionsProductService: CollectionProductService =
+        new CollectionProductService(collectionsGraphDao, collectionsRestDao);
+
+      const result: { isSuccess: boolean; error?: string } =
+        await collectionsProductService.removeProductsFromCollection(
+          collectionName,
+          products
+        );
+      if (result.error) {
+        res.status(500).send("Error removing products. Internal server error");
+        return;
+      }
+      if (result.isSuccess) {
+        res
+          .status(200)
+          .send({ message: "Products successfully removed from collecton" });
+        return;
+      } else {
+        res
+          .status(500)
+          .send({ message: "Error removing products to collection" });
+        return;
+      }
+    } catch (err) {
+      if (err instanceof ResourceNotFound) {
+        res.status(400).send(err);
+        return;
+      } else {
+        console.log("Error removing productrs to collection.", err);
+        res
+          .status(500)
+          .send(
+            `Error removing products from collection. Internal server error`
+          );
         return;
       }
     }

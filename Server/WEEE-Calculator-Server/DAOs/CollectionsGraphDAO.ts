@@ -1,3 +1,4 @@
+import ResourceNotFound from "../ExceptionModels/ResourceNotFoundException";
 import Collection from "../Models/Collection";
 import ShopifyClient from "../ServiceLayer/ShopifyClient";
 class CollectionsGraphDAO extends ShopifyClient {
@@ -18,7 +19,6 @@ class CollectionsGraphDAO extends ShopifyClient {
       const regEx: RegExp = new RegExp("\\s", "g");
       const collectionHandle = collectionName.replace(regEx, "-").toLowerCase();
       console.log(collectionHandle);
-      //TODO test this method
       const response = await this.graphQlClient.request(
         `query getCollectionIdFromHandle($handle: String!) {
                   collectionByHandle(handle: $handle) {
@@ -33,15 +33,26 @@ class CollectionsGraphDAO extends ShopifyClient {
         }
       );
 
-      const collectionid = response.body.data.collectionByHandle.id;
-      const formattedId: string = collectionid.match(/\/(\d+)$/);
-      if (formattedId) {
-        return formattedId[1];
-      } else {
-        return null;
+      console.log(
+        "response in findCollectionIdByName in CollectionsGraphDAO: ",
+        response
+      );
+      if (response.data.collectionByHandle != null) {
+        const collectionId = response.data.collectionByHandle.id;
+
+        const formattedId: string = collectionId.match(/\/(\d+)$/);
+        if (formattedId) {
+          return formattedId[1];
+        } else {
+          return null;
+        }
       }
+
+      throw new ResourceNotFound(
+        `Could not find collection with name ${collectionName}`
+      );
     } catch (e) {
-      throw new Error(`${e.message}`);
+      throw e;
     }
   }
 
@@ -115,11 +126,6 @@ class CollectionsGraphDAO extends ShopifyClient {
               sortOrder
               ruleSet {
                 appliedDisjunctively
-                rules {
-                  column
-                  relation
-                  condition
-                }
               }
             }
           }
@@ -131,11 +137,6 @@ class CollectionsGraphDAO extends ShopifyClient {
               descriptionHtml: collectionDescription,
               ruleSet: {
                 appliedDisjunctively: false,
-                rules: {
-                  column: "TITLE",
-                  relation: "CONTAINS",
-                  condition: "shoe",
-                },
               },
             },
           },
@@ -198,22 +199,26 @@ class CollectionsGraphDAO extends ShopifyClient {
         }`,
         {
           variables: {
-            id: `gid://shopify/Collection/${collectionId}`,
+            id: collectionId,
             productIds: productsArray,
           },
           retries: 2,
         }
       );
-      console.log(result.body.data);
-      if (!result.body.data.collection) {
+      console.log("result: ", result);
+      if (!result.data.collectionAddProducts.collection) {
+        console.log(
+          "Error adding products to collection: ",
+          result.data.collectionAddProducts.userErrors[0]
+        );
         throw new Error(
-          `Error adding products to collection: ${result.body.data.userError}`
+          `Error adding products to collection: ${result.data.collectionAddProducts.userErrors[0]}`
         );
       } else {
         return true;
       }
     } catch (e) {
-      throw new Error(`${e}`);
+      throw e;
     }
   }
 

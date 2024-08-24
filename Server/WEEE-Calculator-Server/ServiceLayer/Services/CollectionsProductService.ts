@@ -20,25 +20,46 @@ class CollectionProductService {
     products: Array<string>
   ) {
     try {
-      const collectionId = await this.collectionsManager.getCollectionIdByName(
+      const result: boolean =
+        await this.collectionsManager.addProductsToCollection(
+          collectionName,
+          products
+        );
+
+      return result;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  public async removeProductsFromCollection(
+    collectionName: string,
+    products: Array<string>
+  ): Promise<{ isSuccess: boolean; error?: string }> {
+    try {
+      const response = await this.collectionsManager.getCollectionIdByName(
         collectionName
       );
 
-      if (!collectionId) {
+      if (!response.isSuccess) {
         throw new ResourceNotFound(
           `Collection ${collectionName} was not found`
         );
       } else {
-        const result: boolean =
-          await this.collectionsManager.addProductsToCollection(
-            collectionId,
+        const result =
+          await this.collectionsManager.removeProductsFromCollection(
+            response.payload,
             products
           );
 
-        return result;
+        if (result.isSuccess) {
+          return { isSuccess: true };
+        }
+
+        return { isSuccess: false, error: result.error };
       }
     } catch (e) {
-      throw new Error(e);
+      return { isSuccess: false, error: e };
     }
   }
 }

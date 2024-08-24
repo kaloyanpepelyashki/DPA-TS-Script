@@ -4,6 +4,7 @@ import CollectionsGraphDAO from "../../DAOs/CollectionsGraphDAO";
 import CollectionsDAO from "../../DAOs/CollectionsDAO";
 import Collection from "../../Models/Collection";
 import Product from "../../Models/Product";
+import ResourceNotFound from "../../ExceptionModels/ResourceNotFoundException";
 class CollectionsManager {
   protected collectionsGraphDao: CollectionsGraphDAO;
   protected collectionsRestDao: CollectionsDAO;
@@ -81,6 +82,10 @@ class CollectionsManager {
 
       return { isSuccess: false, products: [] };
     } catch (e) {
+      console.error(
+        "Error in CollectionsManager. Error getting WEEE collections: ",
+        e
+      );
       return { isSuccess: false, products: null, error: e.message };
     }
   }
@@ -97,6 +102,7 @@ class CollectionsManager {
     try {
       const collectionsUnFiltered: Array<Collection> =
         await this.collectionsGraphDao.getAllCollections();
+
       if (collectionsUnFiltered != null) {
         const collectionsFiltered: Array<Collection> =
           collectionsUnFiltered.filter((collection) =>
@@ -113,9 +119,13 @@ class CollectionsManager {
       return {
         isSuccess: false,
         collections: [],
-        error: "No collections found",
+        error: "No collections found in vendor's store",
       };
     } catch (e) {
+      console.error(
+        "Error in CollectionsManager. Error getting WEEE collections: ",
+        e
+      );
       return { isSuccess: false, collections: [], error: e.message };
     }
   }
@@ -131,18 +141,30 @@ class CollectionsManager {
       }
       return null;
     } catch (e) {
-      throw new Error(e);
+      throw e;
     }
   }
 
-  public async getCollectionIdByName(collectionName: string) {
+  public async getCollectionIdByName(
+    collectionName: string
+  ): Promise<{ isSuccess: boolean; payload: string; error?: string }> {
     try {
       const response: string | null =
         await this.collectionsGraphDao.findCollectionIdByName(collectionName);
 
-      return response;
+      if (response != null) {
+        return { isSuccess: true, payload: response };
+      }
+
+      throw new ResourceNotFound(
+        `Could not get id for collection: ${collectionName}`
+      );
     } catch (e) {
-      throw new Error(e);
+      console.error(
+        "Error in CollectionsManager. Error getting collection id",
+        e
+      );
+      return { isSuccess: false, payload: null, error: e.message };
     }
   }
 
@@ -152,7 +174,7 @@ class CollectionsManager {
    * @param products
    * @returns
    */
-  //TODO Modify the return type of this method
+  //TODO Fix the error : "Error adding productrs to collection. Error: Error adding products to collection gid://shopify/Collection/477489070373: Variable $id of type ID! was provided invalid value"
   public async addProductsToCollection(
     collectionId: string,
     products: Array<string>
