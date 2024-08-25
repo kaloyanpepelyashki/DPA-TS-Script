@@ -21,7 +21,7 @@ class ProductsDAO extends ShopifyClient {
       });
 
       if (response) {
-        return { isSuccess: true, products: response };
+        return { isSuccess: true, products: response.data };
       }
       return { isSuccess: false, products: [] };
     } catch (e) {

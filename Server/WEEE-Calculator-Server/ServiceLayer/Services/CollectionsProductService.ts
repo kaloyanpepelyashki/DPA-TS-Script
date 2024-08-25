@@ -16,49 +16,49 @@ class CollectionProductService {
   }
 
   public async addProductsToCollection(
-    collectionName: string,
+    collectionId: string,
     products: Array<string>
-  ) {
+  ): Promise<{ isSuccess: boolean; error?: string }> {
     try {
-      const result: boolean =
-        await this.collectionsManager.addProductsToCollection(
-          collectionName,
-          products
-        );
+      const result = await this.collectionsManager.addProductsToCollection(
+        collectionId,
+        products
+      );
+
+      if (result.isSuccess) {
+        return { isSuccess: true };
+      }
 
       return result;
     } catch (e) {
-      throw e;
+      console.error(
+        "Error in CollectionsProductService, addProductsToCollection: ",
+        e
+      );
+      return { isSuccess: true, error: e.message };
     }
   }
 
   public async removeProductsFromCollection(
-    collectionName: string,
+    collectionId: string,
     products: Array<string>
   ): Promise<{ isSuccess: boolean; error?: string }> {
     try {
-      const response = await this.collectionsManager.getCollectionIdByName(
-        collectionName
+      const result = await this.collectionsManager.removeProductsFromCollection(
+        collectionId,
+        products
       );
 
-      if (!response.isSuccess) {
-        throw new ResourceNotFound(
-          `Collection ${collectionName} was not found`
-        );
-      } else {
-        const result =
-          await this.collectionsManager.removeProductsFromCollection(
-            response.payload,
-            products
-          );
-
-        if (result.isSuccess) {
-          return { isSuccess: true };
-        }
-
-        return { isSuccess: false, error: result.error };
+      if (result.isSuccess) {
+        return { isSuccess: true };
       }
+
+      return { isSuccess: false, error: result.error };
     } catch (e) {
+      console.error(
+        "Error in CollectionsProductService, removeProductsFromCollection: ",
+        e
+      );
       return { isSuccess: false, error: e };
     }
   }

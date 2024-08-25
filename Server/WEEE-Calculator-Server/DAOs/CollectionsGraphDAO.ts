@@ -102,9 +102,9 @@ class CollectionsGraphDAO extends ShopifyClient {
 
   /**
    *This method uses the shopify graphQl client and creates a collection in the vendor's store
-   * @param collectionName
-   * @param collectionDescription
-   * @returns boolean
+   * @param collectionName the name that should be saved as a name of the newly created collection
+   * @param collectionDescription the description that describes the purpose of the newly created collection
+   * @returns { isSuccess: boolean; error?: string } the isSuccess represents whether the action executed successfully or not, the error message represents an error message if any
    */
   public async createCollection(
     collectionName: string,
@@ -160,15 +160,14 @@ class CollectionsGraphDAO extends ShopifyClient {
 
   /**
    * This method pushes an array of product id's to a collection, usng the graphQl Shopify API
-   * @param collectionId
-   * @param products
-   * @returns
+   * @param collectionId the target collection products will be added to
+   * @param products the array of product ids that are to be added
+   * @returns { isSuccess: boolean }
    */
-  //TODO Test this method after it's been refactored to the request method
   public async addProductsToCollection(
     collectionId: string,
     products: Array<string>
-  ): Promise<boolean> {
+  ): Promise<{ isSuccess: boolean }> {
     try {
       let productsArray: Array<string> = [];
 
@@ -205,7 +204,6 @@ class CollectionsGraphDAO extends ShopifyClient {
           retries: 2,
         }
       );
-      console.log("result: ", result);
       if (!result.data.collectionAddProducts.collection) {
         console.log(
           "Error adding products to collection: ",
@@ -215,7 +213,7 @@ class CollectionsGraphDAO extends ShopifyClient {
           `Error adding products to collection: ${result.data.collectionAddProducts.userErrors[0]}`
         );
       } else {
-        return true;
+        return { isSuccess: true };
       }
     } catch (e) {
       throw e;
@@ -224,8 +222,8 @@ class CollectionsGraphDAO extends ShopifyClient {
 
   /**
    * This method pushes an array of product id's to a collection, usng the graphQl Shopify API
-   * @param collectionId
-   * @param products
+   * @param collectionId the target collection products will be removed from
+   * @param products the array of product ids that are to be removed
    * @returns {isSuccess: boolean, error?: string} isSuccess
    */
   public async removeProductsFromCollection(
@@ -257,18 +255,22 @@ class CollectionsGraphDAO extends ShopifyClient {
     }`,
         {
           variables: {
-            id: `gid://shopify/Collection/${collectionId}`,
+            id: collectionId,
             productIds: productsArray,
           },
         }
       );
-      if (!result.body.data.collection) {
-        throw new Error(
-          "Error in CollectionsGraphDAO. Error removing products from collection: API did not return the expected response"
+      if (!result.data.collectionAddProducts.collection) {
+        console.log(
+          "Error adding products to collection: ",
+          result.data.collectionAddProducts.userErrors[0]
         );
+        throw new Error(
+          `Error adding products to collection: ${result.data.collectionAddProducts.userErrors[0]}`
+        );
+      } else {
+        return { isSuccess: true };
       }
-
-      return { isSuccess: true };
     } catch (e) {
       throw e;
     }

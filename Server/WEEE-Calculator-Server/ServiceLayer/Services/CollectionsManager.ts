@@ -170,29 +170,37 @@ class CollectionsManager {
 
   /**
    * This method adds an array of products to a collection.
-   * @param collectionId
-   * @param products
-   * @returns
+   * @param collectionId the target collection products will be added to
+   * @param products the array of product ids that are to be added
+   * @returns { isSuccess: boolean; error?: string } the isSuccess represents whether the action executed successfully or not, the error message represents an error message if any
    */
-  //TODO Fix the error : "Error adding productrs to collection. Error: Error adding products to collection gid://shopify/Collection/477489070373: Variable $id of type ID! was provided invalid value"
   public async addProductsToCollection(
     collectionId: string,
     products: Array<string>
-  ) {
+  ): Promise<{ isSuccess: boolean; error?: string }> {
     try {
       const response = await this.collectionsGraphDao.addProductsToCollection(
         collectionId,
         products
       );
 
-      return response;
+      if (response.isSuccess) {
+        return { isSuccess: true };
+      }
+
+      return { isSuccess: false, error: "Error adding products to collection" };
     } catch (e) {
-      throw new Error(
-        `Error adding products to collection ${collectionId}: ${e.message}`
-      );
+      console.error("Error in CollectionsManager addProductsToCollection: ", e);
+      return { isSuccess: false, error: e.message };
     }
   }
 
+  /**
+   * This method removes an array of products from a collection
+   * @param collectionId the target collection products will be removed from
+   * @param products the array of product ids that are to be removed
+   * @returns { isSuccess: boolean; error?: string } the isSuccess represents whether the action executed successfully or not, the error message represents an error message if any
+   */
   public async removeProductsFromCollection(
     collectionId: string,
     products: Array<string>
@@ -213,6 +221,10 @@ class CollectionsManager {
         error: "Error removing products from a collection",
       };
     } catch (e) {
+      console.error(
+        "Error in CollectionsManager removeProductsFromCollection: ",
+        e
+      );
       return { isSuccess: false, error: e.message };
     }
   }

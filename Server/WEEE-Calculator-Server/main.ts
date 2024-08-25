@@ -246,8 +246,8 @@ app.get("/api/v1/collection/:id/products/all", async (req, res) => {
     const collectionId = Number(req.params.id);
 
     if (!accessToken || !hostName) {
-      res.status(400).send("Missing headers");
       console.log("Error, missing headers");
+      res.status(400).send("Missing headers");
       return;
     }
 
@@ -340,9 +340,11 @@ app.get("/api/v1/products/all", async (req: Request, res) => {
  * This route is designated for adding products to a collection
  * The route expects headers with string accessToken and string hostName, and a JSON body with:
  * {
- *   "collection": "collectionName",
+ *   "collection": "collectionId",
  *   "products": ["productId", "productId", ...]
  * }
+ * collection is the collection id of the collection that products will be added to
+ * products is an array of product ids that will be added to the collection
  */
 app.post(
   "/api/v1/addProductsToCollection",
@@ -355,9 +357,10 @@ app.post(
         return;
       }
 
-      const collectionName: string = req.body.collection;
+      const collectionId: string = req.body.collection;
       const products: Array<string> = req.body.products;
-      if (typeof collectionName !== "string" || !Array.isArray(products)) {
+
+      if (typeof collectionId !== "string" || !Array.isArray(products)) {
         res.status(400).send({ message: "Prameters are not of correct type" });
         return;
       }
@@ -371,13 +374,19 @@ app.post(
       const collectionsProductService: CollectionProductService =
         new CollectionProductService(collectionsGraphDao, collectionsRestDao);
 
-      const result: boolean =
-        await collectionsProductService.addProductsToCollection(
-          collectionName,
-          products
-        );
+      const result = await collectionsProductService.addProductsToCollection(
+        collectionId,
+        products
+      );
 
-      if (result) {
+      if (result.error) {
+        res
+          .status(500)
+          .send("Error adding products to collection. Internal server error");
+        return;
+      }
+
+      if (result.isSuccess) {
         res
           .status(200)
           .send({ message: "Products successfully added to collecton" });
@@ -407,9 +416,11 @@ app.post(
  * This route is designated for adding products to a collection
  * The route expects headers with string accessToken and string hostName, and a JSON body with:
  * {
- *   "collection": "collectionName",
+ *   "collection": "collectionId",
  *   "products": ["productId", "productId", ...]
  * }
+ * collection is the collection id of the collection that products will be removed from
+ * products is an array of product ids that will be removed from the collection
  */
 app.post(
   "/api/v1/removeProductsFromCollection",
@@ -422,10 +433,10 @@ app.post(
         return;
       }
 
-      const collectionName = req.body.collection;
+      const collectionId = req.body.collection;
       const products = req.body.products;
 
-      if (typeof collectionName !== "string" || !Array.isArray(products)) {
+      if (typeof collectionId !== "string" || !Array.isArray(products)) {
         res.status(400).send("Prameters are not of correct type");
         return;
       }
@@ -441,9 +452,10 @@ app.post(
 
       const result: { isSuccess: boolean; error?: string } =
         await collectionsProductService.removeProductsFromCollection(
-          collectionName,
+          collectionId,
           products
         );
+
       if (result.error) {
         res.status(500).send("Error removing products. Internal server error");
         return;
