@@ -1,6 +1,9 @@
 name: DPA-Application CI
 
-on: [push]
+on:
+  push:
+    branches:
+      - stage # Trigger deployment on the "main" branch
 
 jobs:
   # build:
