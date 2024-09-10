@@ -25,8 +25,15 @@ import OrdersManager from "./ServiceLayer/Services/OrdersManager";
 import OrdersGraphDAO from "./DAOs/OrdersGraphDAO";
 
 const app = express();
+
 app.use(express.json());
 app.use(cors());
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send("Something went wrong! Internal server error");
+});
+
 const port = 4000;
 
 //TODO Modify the neccessary methods to also require country the report is being exporeted for
@@ -121,7 +128,15 @@ app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
 /**
  * This route is designated for creating collections
  * The route expects headers with string accessToken and string hostName
- * The rout expects to get an array of Maps containing collection name as key and collection description as value.
+ * The rout expects to get an array of Maps containing collection title as key and collection description as value:
+ * [
+      {
+        'collectionTitle': "collectionDescription"
+      },
+      {
+        'collectionTitle': "collectionDescription"
+      }, 
+    ]
  */
 app.post("/api/v1/createCollection", async (req: Request, res: Response) => {
   try {
@@ -131,6 +146,8 @@ app.post("/api/v1/createCollection", async (req: Request, res: Response) => {
       return;
     }
     const collections = req.body;
+    console.log("collections received: ", collections);
+
     const collectionsMapsArray: Array<Map<string, string>> = collections.map(
       (obj) => new Map(Object.entries(obj))
     );
@@ -148,13 +165,12 @@ app.post("/api/v1/createCollection", async (req: Request, res: Response) => {
       collectionsGraphDao,
       collectionsRestDao
     );
-    console.log("collections", collections);
     const result: { isSuccess: boolean; error?: string } =
       await collectionsManager.createCollectionsFor(collectionsMapsArray);
 
     if (result.error) {
       console.log("Error creating collections", result.error);
-      res.status(500).send("Error creating collections");
+      res.status(500).send("Error creating collections. Internal server error");
       return;
     }
 
@@ -179,6 +195,7 @@ app.post("/api/v1/createCollection", async (req: Request, res: Response) => {
  */
 app.get("/api/v1/weeeCollections/all", async (req, res) => {
   try {
+    console.log("weeeCollections/all is called");
     const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
     if (!accessToken || !hostName) {
@@ -216,16 +233,22 @@ app.get("/api/v1/weeeCollections/all", async (req, res) => {
       return;
     }
 
-    if (result.isSuccess && result.collections.length > 0) {
-      if (result.collections == null) {
+    if (result.isSuccess) {
+      if (result.collections && result.collections.length <= 0) {
         console.log("No WEEE collections found");
         res.status(404).send("No WEEE collections found");
         return;
       }
 
+      console.log("Wee collections retreived successfully");
       res.status(200).send(JSON.stringify(result.collections));
       return;
     }
+
+    res
+      .status(500)
+      .send(`Error getting all weee collections. Internal server error`);
+    return;
   } catch (e) {
     console.log("Error getting all weee collections: ", e);
     res
@@ -265,6 +288,7 @@ app.get("/api/v1/collection/:id/products/all", async (req, res) => {
 
     if (result.error) {
       console.log("Error getting products for collection: ", result.error);
+      //Returns 500 if error occured
       res
         .status(500)
         .send(
@@ -274,6 +298,7 @@ app.get("/api/v1/collection/:id/products/all", async (req, res) => {
 
     if (result.isSuccess) {
       if (result.products.length == 0) {
+        //Still successful operation, but no products found
         res
           .status(404)
           .send(

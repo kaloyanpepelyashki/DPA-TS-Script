@@ -117,9 +117,8 @@ class CollectionsManager {
       }
 
       return {
-        isSuccess: false,
+        isSuccess: true,
         collections: [],
-        error: "No collections found in vendor's store",
       };
     } catch (e) {
       console.error(

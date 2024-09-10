@@ -135,9 +135,6 @@ class CollectionsGraphDAO extends ShopifyClient {
             input: {
               title: collectionName,
               descriptionHtml: collectionDescription,
-              ruleSet: {
-                appliedDisjunctively: false,
-              },
             },
           },
           retries: 2,
@@ -145,6 +142,10 @@ class CollectionsGraphDAO extends ShopifyClient {
       );
 
       if (result.data.collectionCreate.userErrors.length > 0) {
+        console.log(
+          "Error in CollectionsGraphDAO createCollection. result: ",
+          result
+        );
         return {
           isSuccess: false,
           error: `Error creating collection: ${result.data.collectionCreate.userErrors}`,
@@ -153,7 +154,9 @@ class CollectionsGraphDAO extends ShopifyClient {
         return { isSuccess: true };
       }
     } catch (e: any) {
-      console.log(`Error creating collection: ${e}`);
+      console.log(
+        `Error in CollectionsGraphDAO createCollection. Error creating collection: ${e}`
+      );
       throw e;
     }
   }

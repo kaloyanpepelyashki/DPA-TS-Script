@@ -76,6 +76,7 @@ class ProductsManager {
     collectionId: number
   ): Promise<{ isSuccess: boolean; products: Array<Product>; error?: string }> {
     try {
+      //Here the DAO calls the Shopify API and initialises the fetch;
       const response: { isSuccess: boolean; products: any } =
         await this.productsDao.getProductByCollectionId(collectionId);
 
