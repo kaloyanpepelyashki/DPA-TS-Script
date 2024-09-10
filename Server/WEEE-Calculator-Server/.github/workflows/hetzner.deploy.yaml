@@ -1,0 +1,42 @@
+name: Deploy to Hetzner
+
+on:
+  push:
+    branches:
+      - production # Trigger deployment on the "production" branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20" # Use Node.js 20
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: ./Server/WEEE-Calculator-Server/
+
+      - name: Compile TypeScript
+        run: npm run build
+        working-directory: ./Server/WEEE-Calculator-Server/
+
+      - name: Install sshpass (for password authentication)
+        run: sudo apt-get install -y sshpass
+
+      - name: Copy files to Hetzner server
+        run: |
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -r -o StrictHostKeyChecking=no ./dist/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/srv/weee-calculator-server
+
+      - name: SSH into Hetzner server and install dependencies
+        run: |
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          cd /srv/weee-calculator-server
+          npm install --production  # Install production dependencies only
+          pm2 restart all || pm2 start dist/main.js --name "weee-calculator-server"
+          EOF
