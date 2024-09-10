@@ -259,7 +259,7 @@ app.get("/api/v1/weeeCollections/all", async (req, res) => {
 });
 
 /**
- * This route is designated for getting all products belonging to a collection
+ * This route is designated for getting all products belonging to a  collection
  * The route expects headers with string accessToken and string hostName
  * The route expects to get a collection id url parameter. The parameter is the id of the collection which products need to be fetched.
  */
