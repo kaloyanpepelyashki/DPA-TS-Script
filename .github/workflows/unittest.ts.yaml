@@ -106,12 +106,22 @@ jobs:
       - name: Copy files to Hetzner server
         run: |
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -r -o StrictHostKeyChecking=no Server/WEEE-Calculator-Server/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/srv/weee-calculator-server
+          
+      - name: Create .env file on the server
+        run: |
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          echo "SHOPIFY-CLIENT-ID=${{ secrets.SERVER_ENV_SHOPIFY_CLIENT_ID }}" > /srv/weee-calculator-server/.env
+          echo "SHOPIFY-API-KEY=${{ secrets.SERVER_ENV_SHOPIFY_API_KEY }}" >> /srv/weee-calculator-server/.env
+          echo "SHOPIFY_API_SECRET_KEY=${{ secrets.SERVER_ENV_SHOPIFY_API_SECRET_KEY }}" >> /srv/weee-calculator-server/.env
+          echo "SHOPIFY_API_TOKEN=${{ secrets.SERVER_ENV_SHOPIFY_API_TOKEN }}" >> /srv/weee-calculator-server/.env
+          EOF
 
+        
       - name: SSH into Hetzner server and install dependencies
         run: |
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd /srv/weee-calculator-server
-          npm install --production  # Install production dependencies only
+          npm install --omit=dev  # Install only production dependencies
           pm2 restart all || pm2 start main.js --name "weee-calculator-server"
           EOF
 
