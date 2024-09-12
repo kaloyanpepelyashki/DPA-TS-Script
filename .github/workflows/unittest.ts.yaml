@@ -96,12 +96,16 @@ jobs:
         run: npm run build
         working-directory: ./Server/WEEE-Calculator-Server/
 
+      - name: List dist directory contents (debug step)
+        run: |
+          ls -al Server/WEEE-Calculator-Server/dist  # Verifies that the compiled files exist
+
       - name: Install sshpass (for password authentication)
         run: sudo apt-get install -y sshpass
 
       - name: Copy files to Hetzner server
         run: |
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -r -o StrictHostKeyChecking=no ./dist/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/srv/weee-calculator-server
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -r -o StrictHostKeyChecking=no Server/WEEE-Calculator-Server/dist/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/srv/weee-calculator-server
 
       - name: SSH into Hetzner server and install dependencies
         run: |
