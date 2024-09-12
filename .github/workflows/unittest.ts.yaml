@@ -105,7 +105,7 @@ jobs:
 
       - name: Copy files to Hetzner server
         run: |
-          sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -r -o StrictHostKeyChecking=no Server/WEEE-Calculator-Server/dist/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/srv/weee-calculator-server
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -r -o StrictHostKeyChecking=no Server/WEEE-Calculator-Server/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/srv/weee-calculator-server
 
       - name: SSH into Hetzner server and install dependencies
         run: |
