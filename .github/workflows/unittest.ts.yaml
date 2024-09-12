@@ -88,17 +88,9 @@ jobs:
         with:
           node-version: "20" # Use Node.js 20
 
-      - name: Install dependencies
-        run: npm install
-        working-directory: ./Server/WEEE-Calculator-Server/
-
-      - name: Compile TypeScript
-        run: npm run build
-        working-directory: ./Server/WEEE-Calculator-Server/
-
-      - name: List dist directory contents (debug step)
-        run: |
-          ls -al Server/WEEE-Calculator-Server/dist  # Verifies that the compiled files exist
+      # - name: List dist directory contents (debug step)
+      #   run: |
+      #     ls -al Server/WEEE-Calculator-Server/dist  # Verifies that the compiled files exist
 
       - name: Install sshpass (for password authentication)
         run: sudo apt-get install -y sshpass
@@ -122,6 +114,7 @@ jobs:
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd /srv/weee-calculator-server
           npm install --omit=dev  # Install only production dependencies
+          npm run build # compiles the application
           pm2 restart all || pm2 start main.js --name "weee-calculator-server"
           EOF
 
