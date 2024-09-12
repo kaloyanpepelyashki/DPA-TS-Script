@@ -116,6 +116,6 @@ jobs:
           npm install --omit=dev  # Install only production dependencies
           npm run build # compiles the application
           cd dist
-          pm2 restart all || pm2 start main.js --name "weee-calculator-server"
+          pm2 restart all || pm2 dist/start main.js --name "weee-calculator-server"
           EOF
 
