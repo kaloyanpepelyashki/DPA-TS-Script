@@ -111,5 +111,6 @@ jobs:
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd /srv/weee-calculator-server
           npm install --production  # Install production dependencies only
+          cd dist
           pm2 restart all || pm2 start dist/main.js --name "weee-calculator-server"
           EOF
