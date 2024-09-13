@@ -11,15 +11,18 @@ export const routeErrorLogger: (
   error: any,
   statusCode: number = 500
 ) => {
-  console.error(`Error at ${route}. ${error}. Request IP: ${req.ip}`, {
-    timestamp: new Date().toISOString(),
-    route,
-    method: req.method,
-    ip: req.ip,
-    url: req.url,
-    headers: req.headers["user-agent"],
-    status: statusCode,
-    errorMessage: error.message || error,
-    stack: error.stack || null,
-  });
+  console.error(
+    `!!!=============!!! \nError at ${route}. ${error}. Request IP: ${req.ip}`,
+    {
+      timestamp: new Date().toISOString(),
+      route,
+      method: req.method,
+      ip: req.ip,
+      url: req.url,
+      headers: req.headers["user-agent"],
+      status: statusCode,
+      errorMessage: error.message || error,
+      stack: error.stack || null,
+    }
+  );
 };

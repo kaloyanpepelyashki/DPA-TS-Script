@@ -75,7 +75,7 @@ const port = 4000;
 //TODO Modify the neccessary methods to also require country the report is being exporeted for
 app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
   try {
-    console.log("/initCalculation requested by: ip ", req.ip);
+    console.log("============= \n/initCalculation requested by: ip ", req.ip);
     const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
     if (!accessToken || !hostName) {
@@ -188,7 +188,7 @@ app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
  */
 app.post("/api/v1/createCollection", async (req: Request, res: Response) => {
   try {
-    console.log("/createCollection requested by: ip ", req.ip);
+    console.log("============= \n/createCollection requested by: ip ", req.ip);
     const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
     if (!accessToken || !hostName) {
@@ -256,7 +256,10 @@ app.post("/api/v1/createCollection", async (req: Request, res: Response) => {
  */
 app.get("/api/v1/weeeCollections/all", async (req, res) => {
   try {
-    console.log("/weeeCollecations/all requested by: IP ", req.ip);
+    console.log(
+      "============= \n/weeeCollecations/all requested by: IP ",
+      req.ip
+    );
 
     const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
@@ -331,7 +334,10 @@ app.get("/api/v1/weeeCollections/all", async (req, res) => {
  */
 app.get("/api/v1/collection/:id/products/all", async (req, res) => {
   try {
-    console.log("/collection/:id/products/all requested by: IP ", req.ip);
+    console.log(
+      "============= \n/collection/:id/products/all requested by: IP ",
+      req.ip
+    );
 
     const { accessToken, hostName } = RequestUtils.extractHeaders(req);
     const collectionId = Number(req.params.id);
@@ -413,7 +419,7 @@ app.get("/api/v1/collection/:id/products/all", async (req, res) => {
  */
 app.get("/api/v1/products/all", async (req: Request, res) => {
   try {
-    console.log("/products/all  requested by: IP ", req.ip);
+    console.log("============= \n/products/all  requested by: IP ", req.ip);
 
     const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
@@ -478,7 +484,10 @@ app.post(
   "/api/v1/addProductsToCollection",
   async (req: Request, res: Response) => {
     try {
-      console.log("/addProductsToCollection  requested by: IP ", req.ip);
+      console.log(
+        "============= \n/addProductsToCollection  requested by: IP ",
+        req.ip
+      );
 
       const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
@@ -580,7 +589,10 @@ app.post(
   "/api/v1/removeProductsFromCollection",
   async (req: Request, res: Response) => {
     try {
-      console.log("/removeProductsFromCollection  requested by: IP ", req.ip);
+      console.log(
+        "============= \n/removeProductsFromCollection  requested by: IP ",
+        req.ip
+      );
 
       const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
@@ -674,7 +686,7 @@ app.post(
 );
 
 app.get("/api/v1/health", async (req: Request, res: Response) => {
-  console.log("Health check was requested by ip: ", req.ip);
+  console.log("============= \nHealth check was requested by ip: ", req.ip);
   res.status(200).send("App is healthy");
 });
 
