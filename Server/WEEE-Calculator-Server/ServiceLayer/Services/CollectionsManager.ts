@@ -1,5 +1,3 @@
-import { GraphqlClient, Session, Shopify } from "@shopify/shopify-api";
-import ShopifyClient from "../ShopifyClient";
 import CollectionsGraphDAO from "../../DAOs/CollectionsGraphDAO";
 import CollectionsDAO from "../../DAOs/CollectionsDAO";
 import Collection from "../../Models/Collection";
