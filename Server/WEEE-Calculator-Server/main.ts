@@ -31,11 +31,14 @@ app.use(express.json());
 
 app.use(
   cors({
+    origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "access-token", "host-name"],
     credentials: true,
   })
 );
+
+app.options("*", cors());
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   console.log({
