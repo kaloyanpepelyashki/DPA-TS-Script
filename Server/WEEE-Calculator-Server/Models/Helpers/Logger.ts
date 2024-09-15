@@ -26,3 +26,26 @@ export const routeErrorLogger: (
     }
   );
 };
+
+export const routeResponseLogger: (
+  route: string,
+  req: Request,
+  message: string,
+  statusCode: number
+) => void = (
+  route: string,
+  req: Request,
+  message: string,
+  statusCode: number
+) => {
+  console.info(`------------- \nSuccessful action at ${route}. ${message}`, {
+    timestamp: new Date().toISOString(),
+    route,
+    method: req.method,
+    ip: req.ip,
+    url: req.url,
+    headers: req.headers["user-agent"],
+    status: statusCode,
+    message: message,
+  });
+};
