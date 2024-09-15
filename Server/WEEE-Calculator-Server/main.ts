@@ -28,7 +28,14 @@ import { routeErrorLogger, routeResponseLogger } from "./Models/Helpers/Logger";
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+
+app.use(
+  cors({
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "access-token", "host-name"],
+    credentials: true,
+  })
+);
 
 app.use((req: Request, res: Response, next: NextFunction) => {
   console.log({
@@ -367,12 +374,7 @@ app.get("/api/v1/collection/:id/products/all", async (req, res) => {
     const collectionId = Number(req.params.id);
 
     if (!accessToken || !hostName) {
-      routeErrorLogger(
-        "/collection/:id/products/all",
-        req,
-        "Missing headers",
-        400
-      );
+      routeErrorLogger(route, req, "Missing headers", 400);
 
       res.status(400).send("Missing headers");
       return;
@@ -439,7 +441,7 @@ app.get("/api/v1/collection/:id/products/all", async (req, res) => {
     routeErrorLogger(route, req, e, 500);
 
     res
-      .sendStatus(500)
+      .status(500)
       .send(`Error getting collections's all products. Internal server error`);
     return;
   }
