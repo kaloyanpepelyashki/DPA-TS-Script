@@ -40,10 +40,10 @@ if (environment == "PRODUCTION") {
   // Load SSL certificate and key
   const options = {
     key: fs.readFileSync(
-      "../../etc/letsencrypt/live/api.weee-calcualtor.net.ohmio.net/privkey.pem"
+      "/etc/letsencrypt/live/api.weee-calculator.net.ohmio.net/privkey.pem"
     ),
     cert: fs.readFileSync(
-      "../../etc/letsencrypt/live/api.weee-calcualtor.net.ohmio.net/fullchain.pem"
+      "/etc/letsencrypt/live/api.weee-calculator.net.ohmio.net/fullchain.pem"
     ),
   };
 
