@@ -102,7 +102,7 @@ jobs:
           echo "SHOPIFY-API-KEY=${{ secrets.SERVER_ENV_SHOPIFY_API_KEY }}" >> /srv/weee-calculator-server/.env
           echo "SHOPIFY_API_SECRET_KEY=${{ secrets.SERVER_ENV_SHOPIFY_API_SECRET_KEY }}" >> /srv/weee-calculator-server/.env
           echo "SHOPIFY_API_TOKEN=${{ secrets.SERVER_ENV_SHOPIFY_API_TOKEN }}" >> /srv/weee-calculator-server/.env
-          echo "ENVIRONMENT=STAGING" >> /srv/weee-calculator-server/.env
+          echo "ENVIRONMENT=PRODUCTION" >> /srv/weee-calculator-server/.env
           EOF
 
         
