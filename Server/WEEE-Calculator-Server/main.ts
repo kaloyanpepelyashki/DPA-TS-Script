@@ -1,5 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
+import dotenv from "dotenv";
 
 //Services Imports
 import CollectionsTotalWeightMap from "./BLOC/CollectionsTotalWeighMap";
@@ -25,9 +26,34 @@ import OrdersManager from "./ServiceLayer/Services/OrdersManager";
 import OrdersGraphDAO from "./DAOs/OrdersGraphDAO";
 import { routeErrorLogger, routeResponseLogger } from "./Models/Helpers/Logger";
 
+dotenv.config();
+
 const app = express();
+const https = require("https");
+const fs = require("fs");
 
 app.use(express.json());
+
+const environment = process.env.ENVIRONMENT;
+
+if (environment == "PRODUCTION") {
+  // Load SSL certificate and key
+  const options = {
+    key: fs.readFileSync(
+      "/etc/letsencrypt/live/api.weee-calcualtor.net.ohmio.net/privkey.pem"
+    ),
+    cert: fs.readFileSync(
+      "/etc/letsencrypt/live/api.weee-calcualtor.net.ohmio.net/fullchain.pem"
+    ),
+  };
+
+  // Create HTTPS server
+  https.createServer(options, app).listen(443, () => {
+    console.log(
+      "Server is running securely on https://api.weee-calcualtor.net.ohmio.net"
+    );
+  });
+}
 
 app.use(
   cors({
