@@ -88,10 +88,6 @@ jobs:
         with:
           node-version: "20" # Use Node.js 20
 
-      # - name: List dist directory contents (debug step)
-      #   run: |
-      #     ls -al Server/WEEE-Calculator-Server/dist  # Verifies that the compiled files exist
-
       - name: Install sshpass (for password authentication)
         run: sudo apt-get install -y sshpass
 
@@ -106,6 +102,7 @@ jobs:
           echo "SHOPIFY-API-KEY=${{ secrets.SERVER_ENV_SHOPIFY_API_KEY }}" >> /srv/weee-calculator-server/.env
           echo "SHOPIFY_API_SECRET_KEY=${{ secrets.SERVER_ENV_SHOPIFY_API_SECRET_KEY }}" >> /srv/weee-calculator-server/.env
           echo "SHOPIFY_API_TOKEN=${{ secrets.SERVER_ENV_SHOPIFY_API_TOKEN }}" >> /srv/weee-calculator-server/.env
+          echo "ENVIRONMENT=STAGING" >> /srv/weee-calculator-server/.env
           EOF
 
         
