@@ -35,7 +35,7 @@ const fs = require("fs");
 app.use(express.json());
 
 const environment = process.env.ENVIRONMENT;
-const port = 4000;
+const port = process.env.PORT || 4000;
 
 if (environment == "PRODUCTION") {
   // Load SSL certificate and key
