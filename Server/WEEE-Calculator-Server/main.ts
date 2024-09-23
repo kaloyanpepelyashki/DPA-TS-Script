@@ -35,6 +35,7 @@ const fs = require("fs");
 app.use(express.json());
 
 const environment = process.env.ENVIRONMENT;
+const port = 4000;
 
 if (environment == "PRODUCTION") {
   // Load SSL certificate and key
@@ -48,7 +49,7 @@ if (environment == "PRODUCTION") {
   };
 
   // Create HTTPS server
-  https.createServer(options, app).listen(443, () => {
+  https.createServer(options, app).listen(port, () => {
     console.log(
       "Server is running securely on https://api.weee-calcualtor.net.ohmio.net"
     );
@@ -105,8 +106,6 @@ app.use((err, req: Request, res: Response, next: NextFunction) => {
   });
   res.status(500).send("Something went wrong! Internal server error");
 });
-
-const port = 4000;
 
 //TODO Modify the neccessary methods to also require country the report is being exporeted for
 app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
