@@ -2,7 +2,7 @@
   "name": "dpa-ts-script",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
     "test": "jest",
     "build": "tsc",          

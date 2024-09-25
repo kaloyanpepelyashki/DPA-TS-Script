@@ -8,6 +8,7 @@ import CollectionsManager from "./ServiceLayer/Services/CollectionsManager";
 import ProductsManager from "./ServiceLayer/Services/ProductsManager";
 import CollectionsCalculator from "./ServiceLayer/Services/CollectionsCalculator";
 
+//DAO Factory
 import DaoFactory from "./Factory/DaoFactory";
 
 //DAO imports
@@ -51,7 +52,8 @@ if (environment == "PRODUCTION") {
   // Create HTTPS server
   https.createServer(options, app).listen(port, () => {
     console.log(
-      "Server is running securely on https://api.weee-calcualtor.net.ohmio.net"
+      "Server is running securely on https://api.weee-calcualtor.net.ohmio.net. Port: ",
+      port
     );
   });
 }
