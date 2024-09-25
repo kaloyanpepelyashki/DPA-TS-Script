@@ -113,7 +113,7 @@ jobs:
           cd /srv/weee-calculator-server
           npm install --omit=dev  # Install only production dependencies
           npm run build # compiles the application
-          pm2 restart all || pm2 start dist/main.js --name "weee-calculator-server"
+          pm2 restart all || pm2 start npm dist/main.js --name "weee-calculator-server"
           pm2 save
           EOF
 
