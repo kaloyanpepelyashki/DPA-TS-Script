@@ -27,6 +27,14 @@ export const routeErrorLogger: (
   );
 };
 
+export const errorLogger: (error: any) => void = (error: any) => {
+  console.error(`!!!=============!!! \n Error`, {
+    timestamp: new Date().toISOString(),
+    errorMessage: error.message || error,
+    stack: error.stack || null,
+  });
+};
+
 export const routeResponseLogger: (
   route: string,
   req: Request,

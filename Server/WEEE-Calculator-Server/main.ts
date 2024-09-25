@@ -25,7 +25,11 @@ import Collection from "./Models/Collection";
 import Product from "./Models/Product";
 import OrdersManager from "./ServiceLayer/Services/OrdersManager";
 import OrdersGraphDAO from "./DAOs/OrdersGraphDAO";
-import { routeErrorLogger, routeResponseLogger } from "./Models/Helpers/Logger";
+import {
+  routeErrorLogger,
+  errorLogger,
+  routeResponseLogger,
+} from "./Helpers/Logger";
 
 dotenv.config();
 
@@ -39,23 +43,27 @@ const environment = process.env.ENVIRONMENT;
 const port = process.env.PORT || 4000;
 
 if (environment == "PRODUCTION") {
-  // Load SSL certificate and key
-  const options = {
-    key: fs.readFileSync(
-      "/etc/letsencrypt/live/api.weee-calculator.net.ohmio.net/privkey.pem"
-    ),
-    cert: fs.readFileSync(
-      "/etc/letsencrypt/live/api.weee-calculator.net.ohmio.net/fullchain.pem"
-    ),
-  };
+  try {
+    // Load SSL certificate and key
+    const options = {
+      key: fs.readFileSync(
+        "/etc/letsencrypt/live/api.weee-calculator.net.ohmio.net/privkey.pem"
+      ),
+      cert: fs.readFileSync(
+        "/etc/letsencrypt/live/api.weee-calculator.net.ohmio.net/fullchain.pem"
+      ),
+    };
 
-  // Create HTTPS server
-  https.createServer(options, app).listen(port, () => {
-    console.log(
-      "Server is running securely on https://api.weee-calcualtor.net.ohmio.net. Port: ",
-      port
-    );
-  });
+    // Create HTTPS server
+    https.createServer(options, app).listen(port, () => {
+      console.log(
+        "Server is running securely on https://api.weee-calcualtor.net.ohmio.net. Port: ",
+        port
+      );
+    });
+  } catch (e) {
+    errorLogger(e);
+  }
 }
 
 app.use(
@@ -737,5 +745,5 @@ app.get("/api/v1/health", async (req: Request, res: Response) => {
 });
 
 app.listen(port, async () => {
-  console.log(`app is running on ${port}`);
+  console.log(`App is running on ${port}`);
 });
