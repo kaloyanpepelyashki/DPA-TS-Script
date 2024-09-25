@@ -104,6 +104,8 @@ jobs:
           echo "SHOPIFY_API_TOKEN=${{ secrets.SERVER_ENV_SHOPIFY_API_TOKEN }}" >> /srv/weee-calculator-server/.env
           echo "PORT=${{ secrets.SERVER_ENV_PORT }}" >> /srv/weee-calculator-server/.env
           echo "ENVIRONMENT=PRODUCTION" >> /srv/weee-calculator-server/.env
+          echo "Contents of .env file:"
+          cat /srv/weee-calculator-server/.env
           EOF
 
         
@@ -111,6 +113,8 @@ jobs:
         run: |
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd /srv/weee-calculator-server
+          pwd
+          ls -la
           npm install --omit=dev  # Install only production dependencies
           npm run build # compiles the application
           pm2 delete "weee-calculator-server" || true
