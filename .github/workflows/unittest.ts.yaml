@@ -107,13 +107,14 @@ jobs:
           EOF
 
         
-      - name: SSH into Hetzner server and install dependencies
+      - name: SSH into Hetzner server, install dependencies and start process
         run: |
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
           cd /srv/weee-calculator-server
           npm install --omit=dev  # Install only production dependencies
           npm run build # compiles the application
-          pm2 restart all || pm2 start npm dist/main.js --name "weee-calculator-server"
+          pm2 delete "weee-calculator-server" || true
+          pm2 start dist/main.js --name "weee-calculator-server"
           pm2 save
           EOF
 
