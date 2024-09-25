@@ -64,6 +64,10 @@ if (environment == "PRODUCTION") {
   } catch (e) {
     errorLogger(e);
   }
+} else {
+  app.listen(port, async () => {
+    console.log(`App is running on ${port}`);
+  });
 }
 
 app.use(
@@ -742,8 +746,4 @@ app.post(
 app.get("/api/v1/health", async (req: Request, res: Response) => {
   console.log("============= \nHealth check was requested by ip: ", req.ip);
   res.status(200).send("App is healthy");
-});
-
-app.listen(port, async () => {
-  console.log(`App is running on ${port}`);
 });
