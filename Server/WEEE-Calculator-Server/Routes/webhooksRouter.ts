@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
 import path from "path";
-import { verifyShopifyWebhook } from "../Utilities/WebHookUtils";
+import { verifyShopifyWebhook } from "../Utilities/WebhookUtils";
 
 const webHookRouter = express();
 
