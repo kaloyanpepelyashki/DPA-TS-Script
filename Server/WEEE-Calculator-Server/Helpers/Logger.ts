@@ -67,7 +67,7 @@ export const routeResponseLogger: (
  * @param message the message string to be logged in the console.
  * @returns void
  */
-export const logger: (message: string) => void = (message: string) => {
+export const generalLog: (message: string) => void = (message: string) => {
   if (message.length > 0) {
     console.log(`----------- \n >Log: ${message}`, {
       timestamp: new Date().toISOString(),

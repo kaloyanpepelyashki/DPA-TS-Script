@@ -130,7 +130,6 @@ app.use("/health", healthRouter);
 //========= Web hook routes ======== //
 app.use("/gdpr-compliance/webhooks", webHookRouter);
 
-//TODO Modify the neccessary methods to also require country the report is being exporeted for
 app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
   const route: string = "/initCalculation";
   try {
