@@ -2,6 +2,8 @@ import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 
+import webHookRouter from "./Routes/webhooksRouter";
+
 //Services Imports
 import CollectionsTotalWeightMap from "./BLOC/CollectionsTotalWeighMap";
 import CollectionsManager from "./ServiceLayer/Services/CollectionsManager";
@@ -30,6 +32,7 @@ import {
   errorLogger,
   routeResponseLogger,
 } from "./Helpers/Logger";
+import healthRouter from "./Routes/HealthRouter";
 
 dotenv.config();
 
@@ -121,7 +124,12 @@ app.use((err, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send("Something went wrong! Internal server error");
 });
 
-//TODO Modify the neccessary methods to also require country the report is being exporeted for
+//========= Health check routes ======== //
+app.use("/health", healthRouter);
+
+//========= Web hook routes ======== //
+app.use("/gdpr-compliance/webhooks", webHookRouter);
+
 app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
   const route: string = "/initCalculation";
   try {
