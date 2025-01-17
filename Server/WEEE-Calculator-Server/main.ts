@@ -32,6 +32,7 @@ import {
   errorLogger,
   routeResponseLogger,
 } from "./Helpers/Logger";
+import healthRouter from "./Routes/HealthRouter";
 
 dotenv.config();
 
@@ -123,8 +124,11 @@ app.use((err, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send("Something went wrong! Internal server error");
 });
 
+//========= Health check routes ======== //
+app.use("/health", healthRouter);
+
 //========= Web hook routes ======== //
-app.use("gdpr-compliance/webhooks", webHookRouter);
+app.use("/gdpr-compliance/webhooks", webHookRouter);
 
 //TODO Modify the neccessary methods to also require country the report is being exporeted for
 app.post("/api/v1/initCalculation", async (req: Request, res: Response) => {
