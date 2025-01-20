@@ -33,6 +33,16 @@ jobs:
         run: |
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" scp -r -o StrictHostKeyChecking=no ./dist/* ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/srv/weee-calculator-server
 
+      -name: Set up env file on the server
+        run: |
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          echo "PGSQL_USERNAME=${{ secrets.SERVER_PGSQL_USERNAME }}" > /srv/weee-calculator-server/.env
+          echo "PGSQL_PASSWORD=${{ secrets.SERVER_PGSQL_PASSWORD }}" >> /srv/weee-calculator-server/.env
+          echo "PGSQL_HOST=${{ secrets.SERVER_PGSQL_HOST }}" >> /srv/weee-calculator-server/.env
+          echo "PGSQL_PORT=${{ secrets.SERVER_PGSQL_PORT }}" >> /srv/weee-calculator-server/.env
+          echo "PGSQL_PORT=${{ secrets.SERVER_PGSQL_DB_NAME}}" >> /srv/weee-calculator-server/.env
+          EOF
+
       - name: SSH into Hetzner server and install dependencies
         run: |
           sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
