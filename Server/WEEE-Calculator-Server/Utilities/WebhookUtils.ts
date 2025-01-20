@@ -14,14 +14,20 @@ const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET;
  * @returns void
  */
 export const verifyShopifyWebhook = (
-  route: string,
   req: Request,
   res: Response,
   next: NextFunction
 ): void => {
+  const ROUTE = req.baseUrl + req.path;
+
   try {
     const hmacHeader = req.get("X-Shopify-Hmac-Sha256");
     const rawBody = (req as any).rawBody as Buffer;
+
+    if (rawBody == null) {
+      throw new Error("Request rawBody is null");
+    }
+
     const hash = crypto
       .createHmac("sha256", SHOPIFY_API_SECRET)
       .update(rawBody)
@@ -30,13 +36,13 @@ export const verifyShopifyWebhook = (
     if (hash === hmacHeader) {
       next();
     } else {
-      routeErrorLogger(route, req, "Unauthorized", 401);
+      routeErrorLogger(ROUTE, req, "Unauthorized", 401);
 
       res.status(401).send("Unauthorized");
       return;
     }
   } catch (error) {
-    routeErrorLogger(route, req, error, 500);
+    routeErrorLogger(ROUTE, req, error, 500);
 
     res.status(500).send("Internal Server Error");
     return;

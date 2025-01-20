@@ -14,31 +14,105 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
+const dotenv_1 = __importDefault(require("dotenv"));
+const webhooksRouter_1 = __importDefault(require("./Routes/webhooksRouter"));
 const CollectionsManager_1 = __importDefault(require("./ServiceLayer/Services/CollectionsManager"));
 const ProductsManager_1 = __importDefault(require("./ServiceLayer/Services/ProductsManager"));
 const CollectionsCalculator_1 = __importDefault(require("./ServiceLayer/Services/CollectionsCalculator"));
+//DAO Factory
 const DaoFactory_1 = __importDefault(require("./Factory/DaoFactory"));
 //Utilities Imports
 const RequestUtils_1 = __importDefault(require("./Utilities/RequestUtils "));
 const CollectionsProductService_1 = __importDefault(require("./ServiceLayer/Services/CollectionsProductService"));
 const ResourceNotFoundException_1 = __importDefault(require("./ExceptionModels/ResourceNotFoundException"));
 const OrdersManager_1 = __importDefault(require("./ServiceLayer/Services/OrdersManager"));
+const Logger_1 = require("./Helpers/Logger");
+const HealthRouter_1 = __importDefault(require("./Routes/HealthRouter"));
+dotenv_1.default.config();
 const app = (0, express_1.default)();
+const https = require("https");
+const fs = require("fs");
 app.use(express_1.default.json());
-app.use((0, cors_1.default)());
+const environment = process.env.ENVIRONMENT;
+const port = process.env.PORT || 4000;
+if (environment == "PRODUCTION") {
+    try {
+        // Load SSL certificate and key
+        const options = {
+            key: fs.readFileSync("/etc/letsencrypt/live/api.weee-calculator.net.ohmio.net/privkey.pem"),
+            cert: fs.readFileSync("/etc/letsencrypt/live/api.weee-calculator.net.ohmio.net/fullchain.pem"),
+        };
+        // Create HTTPS server
+        https.createServer(options, app).listen(port, () => {
+            console.log("Server is running securely on https://api.weee-calcualtor.net.ohmio.net. Port: ", port);
+        });
+    }
+    catch (e) {
+        (0, Logger_1.errorLogger)(e);
+    }
+}
+else {
+    app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
+        console.log(`App is running on ${port}`);
+    }));
+}
+app.use((0, cors_1.default)({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "access-token", "host-name"],
+    credentials: true,
+}));
+app.options("*", (0, cors_1.default)());
+app.use((req, res, next) => {
+    console.log({
+        ip: req.ip,
+        method: req.method,
+        url: req.url,
+        headers: req.headers["user-agent"],
+        query: req.query,
+        params: req.params,
+    });
+    next();
+});
+app.use((req, res, next) => {
+    const startTime = Date.now();
+    res.on("finish", () => {
+        const elapsedTime = Date.now() - startTime;
+        console.log({
+            method: req.method,
+            url: req.url,
+            status: res.statusCode,
+            responseTime: `${elapsedTime}ms`,
+            ip: req.ip,
+        });
+    });
+    next();
+});
 app.use((err, req, res, next) => {
     console.error(err.stack);
+    console.error({
+        message: err.message,
+        stack: err.stack,
+        url: req.url,
+        method: req.method,
+        status: res.statusCode,
+        ip: req.ip,
+    });
     res.status(500).send("Something went wrong! Internal server error");
 });
-const port = 4000;
-//TODO Modify the neccessary methods to also require country the report is being exporeted for
+//========= Health check routes ======== //
+app.use("/health", HealthRouter_1.default);
+//========= Web hook routes ======== //
+app.use("/gdpr-compliance/webhooks", webhooksRouter_1.default);
 app.post("/api/v1/initCalculation", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const route = "/initCalculation";
     try {
-        console.log("Request in /initCalculation received");
+        console.log("============= \n/initCalculation requested by: ip ", req.ip);
         const { accessToken, hostName } = RequestUtils_1.default.extractHeaders(req);
         if (!accessToken || !hostName) {
+            (0, Logger_1.routeErrorLogger)(route, req, "Missing headers", 400);
             res.status(400).send("Missing headers");
-            console.log("Error, missing headers");
             return;
         }
         const collectionTitles = req.body.collectionTitles;
@@ -63,11 +137,12 @@ app.post("/api/v1/initCalculation", (req, res) => __awaiter(void 0, void 0, void
             //Gets the vendor's store orders count for the specified period
             const shopOrdersCount = yield ordersManager.getShopOrdersCountFor(reportFromDate, reportToDate, reportCountry);
             if (shopOrdersCount.error || collectionsTotalWeights.error) {
-                console.log("Internal server error when genrating report");
-                return res.status(500).send(`Internal server error`);
+                (0, Logger_1.routeErrorLogger)(route, req, (_a = shopOrdersCount.error) !== null && _a !== void 0 ? _a : collectionsTotalWeights.error, 500);
+                res.status(500).send(`Internal server error`);
+                return;
             }
             if (shopOrdersCount.isSuccess && collectionsTotalWeights.isSuccess) {
-                console.log("Report sent");
+                (0, Logger_1.routeResponseLogger)(route, req, "Calculation successful, report sent", 200);
                 return res.status(200).send(JSON.stringify({
                     totalWeights: Object.fromEntries(collectionsTotalWeights.collectionsTotalWeights),
                     ordersCount: shopOrdersCount.count,
@@ -75,13 +150,15 @@ app.post("/api/v1/initCalculation", (req, res) => __awaiter(void 0, void 0, void
             }
         }
         else {
-            console.log("Error, missing parameters");
-            return res.status(400).send("Missing parameters");
+            (0, Logger_1.routeErrorLogger)(route, req, "Missing parameters", 400);
+            res.status(400).send("Missing parameters");
+            return;
         }
     }
     catch (e) {
-        console.log("Internal server error when genrating report");
-        return res.status(500).send(`Internal server error`);
+        (0, Logger_1.routeErrorLogger)(route, req, "Internal server error", 500);
+        res.status(500).send(`Internal server error`);
+        return;
     }
 }));
 /**
@@ -98,9 +175,12 @@ app.post("/api/v1/initCalculation", (req, res) => __awaiter(void 0, void 0, void
     ]
  */
 app.post("/api/v1/createCollection", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const route = "/createCollection";
     try {
+        console.log("============= \n/createCollection requested by: ip ", req.ip);
         const { accessToken, hostName } = RequestUtils_1.default.extractHeaders(req);
         if (!accessToken || !hostName) {
+            (0, Logger_1.routeErrorLogger)(route, req, "Missing headers", 400);
             res.status(400).send("Missing headers");
             return;
         }
@@ -115,22 +195,23 @@ app.post("/api/v1/createCollection", (req, res) => __awaiter(void 0, void 0, voi
         const collectionsManager = new CollectionsManager_1.default(collectionsGraphDao, collectionsRestDao);
         const result = yield collectionsManager.createCollectionsFor(collectionsMapsArray);
         if (result.error) {
-            console.log("Error creating collections", result.error);
+            (0, Logger_1.routeErrorLogger)(route, req, result.error, 500);
             res.status(500).send("Error creating collections. Internal server error");
             return;
         }
         if (result.isSuccess) {
+            (0, Logger_1.routeResponseLogger)(route, req, "Collections created successfully", 201);
             res.status(201).send("Collections created");
             return;
         }
         else {
+            (0, Logger_1.routeErrorLogger)(route, req, result.error ? result.error : "Action unsuccessful", 500);
             res.status(500).send("Error creating collections");
-            console.log("Error creating collections", result.error);
             return;
         }
     }
     catch (e) {
-        console.log("Error creating collections", e);
+        (0, Logger_1.routeErrorLogger)(route, req, "Internal server error", 500);
         res.status(500).send(`Internal server error`);
         return;
     }
@@ -140,12 +221,13 @@ app.post("/api/v1/createCollection", (req, res) => __awaiter(void 0, void 0, voi
  * The route expects headers with string accessToken and string hostName
  */
 app.get("/api/v1/weeeCollections/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const route = "/weeeCollections/all";
     try {
-        console.log("weeeCollections/all is called");
+        console.log("============= \n/weeeCollecations/all requested by: IP ", req.ip);
         const { accessToken, hostName } = RequestUtils_1.default.extractHeaders(req);
         if (!accessToken || !hostName) {
+            (0, Logger_1.routeErrorLogger)(route, req, "Missing headers", 400);
             res.status(400).send("Missing headers");
-            console.log("Error, missing headers");
             return;
         }
         //Initialising the DAO factory class
@@ -157,7 +239,7 @@ app.get("/api/v1/weeeCollections/all", (req, res) => __awaiter(void 0, void 0, v
         const collectionsManager = new CollectionsManager_1.default(collectionsGraphDao, collectionsRestDao);
         const result = yield collectionsManager.getWeeeCollections();
         if (result.error) {
-            console.log("Error getting all weee collections: ", result.error);
+            (0, Logger_1.routeErrorLogger)(route, req, result.error, 500);
             res
                 .status(500)
                 .send(`Error getting weee collections. Internal server error`);
@@ -165,21 +247,22 @@ app.get("/api/v1/weeeCollections/all", (req, res) => __awaiter(void 0, void 0, v
         }
         if (result.isSuccess) {
             if (result.collections && result.collections.length <= 0) {
-                console.log("No WEEE collections found");
+                (0, Logger_1.routeResponseLogger)(route, req, "No WEEE collections found in vendor's store", 404);
                 res.status(404).send("No WEEE collections found");
                 return;
             }
-            console.log("Wee collections retreived successfully");
+            (0, Logger_1.routeResponseLogger)(route, req, "WEEE collections retreived successfully", 200);
             res.status(200).send(JSON.stringify(result.collections));
             return;
         }
+        (0, Logger_1.routeErrorLogger)(route, req, "Internal server error", 500);
         res
             .status(500)
             .send(`Error getting all weee collections. Internal server error`);
         return;
     }
     catch (e) {
-        console.log("Error getting all weee collections: ", e);
+        (0, Logger_1.routeErrorLogger)(route, req, e, 500);
         res
             .status(500)
             .send(`Error getting all weee collections. Internal server error`);
@@ -187,16 +270,18 @@ app.get("/api/v1/weeeCollections/all", (req, res) => __awaiter(void 0, void 0, v
     }
 }));
 /**
- * This route is designated for getting all products belonging to a collection
+ * This route is designated for getting all products belonging to a  collection
  * The route expects headers with string accessToken and string hostName
  * The route expects to get a collection id url parameter. The parameter is the id of the collection which products need to be fetched.
  */
 app.get("/api/v1/collection/:id/products/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const route = "/collection/:id/products/all";
     try {
+        console.log("============= \n/collection/:id/products/all requested by: IP ", req.ip);
         const { accessToken, hostName } = RequestUtils_1.default.extractHeaders(req);
         const collectionId = Number(req.params.id);
         if (!accessToken || !hostName) {
-            console.log("Error, missing headers");
+            (0, Logger_1.routeErrorLogger)(route, req, "Missing headers", 400);
             res.status(400).send("Missing headers");
             return;
         }
@@ -208,7 +293,7 @@ app.get("/api/v1/collection/:id/products/all", (req, res) => __awaiter(void 0, v
         const productsManager = new ProductsManager_1.default(productsDAO);
         const result = yield productsManager.getProductsForCollection(collectionId);
         if (result.error) {
-            console.log("Error getting products for collection: ", result.error);
+            (0, Logger_1.routeErrorLogger)(route, req, result.error, 500);
             //Returns 500 if error occured
             res
                 .status(500)
@@ -217,19 +302,26 @@ app.get("/api/v1/collection/:id/products/all", (req, res) => __awaiter(void 0, v
         if (result.isSuccess) {
             if (result.products.length == 0) {
                 //Still successful operation, but no products found
+                (0, Logger_1.routeResponseLogger)(route, req, `No products were found that belong to collection ${collectionId} in vendors store.`, 404);
                 res
                     .status(404)
                     .send(`No products were found that belong to collection ${collectionId} in vendors store.`);
                 return;
             }
+            (0, Logger_1.routeResponseLogger)(route, req, "Collection products retreived successfully", 200);
             res.status(200).send(result.products);
             return;
         }
+        (0, Logger_1.routeErrorLogger)(route, req, "Internal server error", 500);
+        //Returns 500 if error occured
+        res
+            .status(500)
+            .send("Error getting collections's all products. Internal server error");
     }
     catch (e) {
-        console.log("Error getting products for collection: ", e.message);
+        (0, Logger_1.routeErrorLogger)(route, req, e, 500);
         res
-            .sendStatus(500)
+            .status(500)
             .send(`Error getting collections's all products. Internal server error`);
         return;
     }
@@ -240,11 +332,13 @@ app.get("/api/v1/collection/:id/products/all", (req, res) => __awaiter(void 0, v
  * The route sends back an array of product objects
  */
 app.get("/api/v1/products/all", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const route = "/api/v1/products/all";
     try {
+        console.log("============= \n/products/all  requested by: IP ", req.ip);
         const { accessToken, hostName } = RequestUtils_1.default.extractHeaders(req);
         if (!accessToken || !hostName) {
+            (0, Logger_1.routeErrorLogger)(route, req, "Missing headers", 400);
             res.status(400).send("Missing headers");
-            console.log("Error, missing headers");
             return;
         }
         const daoFactory = new DaoFactory_1.default(accessToken, hostName);
@@ -252,24 +346,28 @@ app.get("/api/v1/products/all", (req, res) => __awaiter(void 0, void 0, void 0, 
         const productManager = new ProductsManager_1.default(productsDao);
         const result = yield productManager.getAllActiveProducts();
         if (result.error) {
+            (0, Logger_1.routeErrorLogger)(route, req, result.error, 500);
             res.status(500).send("Error getting all products. Internal server error");
             return;
         }
         if (result.isSuccess) {
             if (result.products.length == 0) {
+                (0, Logger_1.routeResponseLogger)(route, req, `No products were found in vendors store.`, 404);
                 res.status(404).send("No products were found in vendors store.");
                 return;
             }
+            (0, Logger_1.routeResponseLogger)(route, req, "All products retreived successfully", 200);
             res.status(200).send(result.products);
             return;
         }
         else {
+            (0, Logger_1.routeErrorLogger)(route, req, "Internal server error", 500);
             res.status(500).send("Error getting all products. Internal server error");
             return;
         }
     }
     catch (e) {
-        console.log("Error getting all products", e);
+        (0, Logger_1.routeErrorLogger)(route, req, e, 500);
         res.status(500).send(`Error getting all products. Internal server error`);
         return;
     }
@@ -285,15 +383,19 @@ app.get("/api/v1/products/all", (req, res) => __awaiter(void 0, void 0, void 0, 
  * products is an array of product ids that will be added to the collection
  */
 app.post("/api/v1/addProductsToCollection", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const route = "/addProductsToCollection";
     try {
+        console.log("============= \n/addProductsToCollection  requested by: IP ", req.ip);
         const { accessToken, hostName } = RequestUtils_1.default.extractHeaders(req);
         if (!accessToken || !hostName) {
+            (0, Logger_1.routeErrorLogger)(route, req, "Missing headers", 400);
             res.status(400).send({ message: "Missing headers" });
             return;
         }
         const collectionId = req.body.collection;
         const products = req.body.products;
         if (typeof collectionId !== "string" || !Array.isArray(products)) {
+            (0, Logger_1.routeErrorLogger)(route, req, "Parameters of wrong type", 400);
             res.status(400).send({ message: "Prameters are not of correct type" });
             return;
         }
@@ -303,18 +405,21 @@ app.post("/api/v1/addProductsToCollection", (req, res) => __awaiter(void 0, void
         const collectionsProductService = new CollectionsProductService_1.default(collectionsGraphDao, collectionsRestDao);
         const result = yield collectionsProductService.addProductsToCollection(collectionId, products);
         if (result.error) {
+            (0, Logger_1.routeErrorLogger)(route, req, result.error, 500);
             res
                 .status(500)
                 .send("Error adding products to collection. Internal server error");
             return;
         }
         if (result.isSuccess) {
+            (0, Logger_1.routeResponseLogger)(route, req, "Products added successfully", 200);
             res
                 .status(200)
                 .send({ message: "Products successfully added to collecton" });
             return;
         }
         else {
+            (0, Logger_1.routeErrorLogger)(route, req, "Internal server error", 500);
             res
                 .status(500)
                 .send({ message: "Error adding products to collection" });
@@ -323,11 +428,12 @@ app.post("/api/v1/addProductsToCollection", (req, res) => __awaiter(void 0, void
     }
     catch (err) {
         if (err instanceof ResourceNotFoundException_1.default) {
+            (0, Logger_1.routeErrorLogger)(route, req, err, 400);
             res.status(400).send(err);
             return;
         }
         else {
-            console.log("Error adding productrs to collection.", err);
+            (0, Logger_1.routeErrorLogger)(route, req, err, 500);
             res
                 .status(500)
                 .send(`Error adding products to collection. Internal server error`);
@@ -346,15 +452,19 @@ app.post("/api/v1/addProductsToCollection", (req, res) => __awaiter(void 0, void
  * products is an array of product ids that will be removed from the collection
  */
 app.post("/api/v1/removeProductsFromCollection", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const route = "/removeProductsFromCollection";
     try {
+        console.log("============= \n/removeProductsFromCollection  requested by: IP ", req.ip);
         const { accessToken, hostName } = RequestUtils_1.default.extractHeaders(req);
         if (!accessToken || !hostName) {
+            (0, Logger_1.routeErrorLogger)(route, req, "Missing headers", 500);
             res.status(400).send("Missing headers");
             return;
         }
         const collectionId = req.body.collection;
         const products = req.body.products;
         if (typeof collectionId !== "string" || !Array.isArray(products)) {
+            (0, Logger_1.routeErrorLogger)(route, req, "Parameters of wrong type", 500);
             res.status(400).send("Prameters are not of correct type");
             return;
         }
@@ -364,19 +474,22 @@ app.post("/api/v1/removeProductsFromCollection", (req, res) => __awaiter(void 0,
         const collectionsProductService = new CollectionsProductService_1.default(collectionsGraphDao, collectionsRestDao);
         const result = yield collectionsProductService.removeProductsFromCollection(collectionId, products);
         if (result.error) {
+            (0, Logger_1.routeErrorLogger)(route, req, result.error, 500);
             res.status(500).send("Error removing products. Internal server error");
             return;
         }
         if (result.isSuccess) {
+            (0, Logger_1.routeResponseLogger)(route, req, "Products removed successfully", 200);
             res
                 .status(200)
                 .send({ message: "Products successfully removed from collecton" });
             return;
         }
         else {
+            (0, Logger_1.routeErrorLogger)(route, req, "Internal server error", 500);
             res
                 .status(500)
-                .send({ message: "Error removing products to collection" });
+                .send({ message: "Error removing products from collection" });
             return;
         }
     }
@@ -386,7 +499,7 @@ app.post("/api/v1/removeProductsFromCollection", (req, res) => __awaiter(void 0,
             return;
         }
         else {
-            console.log("Error removing productrs to collection.", err);
+            (0, Logger_1.routeErrorLogger)(route, req, err, 500);
             res
                 .status(500)
                 .send(`Error removing products from collection. Internal server error`);
@@ -395,9 +508,7 @@ app.post("/api/v1/removeProductsFromCollection", (req, res) => __awaiter(void 0,
     }
 }));
 app.get("/api/v1/health", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.status(200).send("Healthy");
-}));
-app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(`app is running on ${port}`);
+    console.log("============= \nHealth check was requested by ip: ", req.ip);
+    res.status(200).send("App is healthy");
 }));
 //# sourceMappingURL=main.js.map

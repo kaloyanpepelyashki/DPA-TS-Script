@@ -13,7 +13,7 @@ export default function initConnection() {
   try {
     const dbConnectionObject: ClientConfig = {
       user: PGSQL_USERNAME,
-      password: PGSQL_PASSWORD,
+      password: PGSQL_PASSWORD as string,
       host: PGSQL_HOST,
       port: PGSQL_PORT,
       database: PGSQL_DB_NAME,

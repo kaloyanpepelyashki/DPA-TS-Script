@@ -12,7 +12,7 @@ export const routeErrorLogger: (
   statusCode: number = 500
 ) => {
   console.error(
-    `!!!=============!!! \n !>Error: At ${route}. ${error}. Request IP: ${req.ip}`,
+    `!!!=============!!! \n !>Error: At ${route}. ${error}. Request IP: ${req.ip} \n`,
     {
       timestamp: new Date().toISOString(),
       route,
@@ -47,7 +47,7 @@ export const routeResponseLogger: (
   statusCode: number
 ) => {
   console.info(
-    `------------- \n >Log: Successful action at ${route}. ${message}`,
+    `------------- \n >Log: Successful action at ${route}. ${message} \n`,
     {
       timestamp: new Date().toISOString(),
       route,
@@ -69,7 +69,7 @@ export const routeResponseLogger: (
  */
 export const generalLog: (message: string) => void = (message: string) => {
   if (message.length > 0) {
-    console.log(`----------- \n >Log: ${message}`, {
+    console.log(`----------- \n >Log: ${message} \n`, {
       timestamp: new Date().toISOString(),
     });
   }

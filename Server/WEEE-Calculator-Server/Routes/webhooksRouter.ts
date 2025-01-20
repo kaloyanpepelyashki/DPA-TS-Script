@@ -1,5 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import { verifyShopifyWebhook } from "../Utilities/WebhookUtils";
+import PgsqlAccessor from "../Database/PgsqlAccessor";
+import { routeErrorLogger, routeResponseLogger } from "../Helpers/Logger";
 
 const webHookRouter = express();
 
@@ -8,9 +10,26 @@ const webHookRouter = express();
  */
 webHookRouter.post(
   "/shop/redact",
+  verifyShopifyWebhook,
   async (req: Request, res: Response, next: NextFunction) => {
     const ROUTE = req.baseUrl + req.path;
-    verifyShopifyWebhook(ROUTE, req, res, next);
+    const hostName = req.body.shop;
+    const pgSqlAccessor = new PgsqlAccessor();
+
+    const queryResult = pgSqlAccessor.deleteShopRecord(hostName);
+
+    if (queryResult.isSuccess) {
+      routeResponseLogger(
+        ROUTE,
+        req,
+        "All shop data erased successfully.",
+        200
+      );
+      res.status(200).send("All shop data erased.");
+    }
+
+    routeErrorLogger(ROUTE, req, queryResult.error, 500);
+    res.status(500).send("Could not erase shop data. Internal server error.");
   }
 );
 
@@ -19,12 +38,17 @@ webHookRouter.post(
  */
 webHookRouter.post(
   "/customer/redact",
+  verifyShopifyWebhook,
   async (req: Request, res: Response, next: NextFunction) => {
     const ROUTE = req.baseUrl + req.path;
-    res.send(`this is the webhooks/${ROUTE}`);
-    verifyShopifyWebhook(ROUTE, req, res, next);
 
-    res.status(200).send("No customer data has been stored");
+    routeResponseLogger(
+      ROUTE,
+      req,
+      "No customer data to erase. No action necessary.",
+      200
+    );
+    res.status(200).send("No customer data was stored.");
   }
 );
 
@@ -33,9 +57,18 @@ webHookRouter.post(
  */
 webHookRouter.post(
   "/customer/data_request",
+  verifyShopifyWebhook,
   async (req: Request, res: Response, next: NextFunction) => {
     const ROUTE = req.baseUrl + req.path;
-    verifyShopifyWebhook(ROUTE, req, res, next);
+
+    routeResponseLogger(
+      ROUTE,
+      req,
+      "No customer data stored. No action necessary.",
+      200
+    );
+
+    res.status(200).send("No customer data stored.");
   }
 );
 

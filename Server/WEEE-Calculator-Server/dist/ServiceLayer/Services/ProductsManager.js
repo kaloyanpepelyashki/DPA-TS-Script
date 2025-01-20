@@ -13,6 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Product_1 = __importDefault(require("../../Models/Product"));
+/**
+ * This manager class is soley in charge of providing
+ *  methods for all actions related to the Product object
+ *  in Shopify API
+ */
 class ProductsManager {
     constructor(productsDao) {
         this.productsDao = productsDao;
