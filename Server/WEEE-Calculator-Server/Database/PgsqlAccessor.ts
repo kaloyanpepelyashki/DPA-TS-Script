@@ -21,8 +21,20 @@ class PgsqlAccessor {
     }
   }
 
-  public deleteShopRecord() {
-    this.client.query("DELETE FROM ");
+  public deleteShopRecord(shop: string): {
+    isSuccess: boolean;
+    error?: string;
+  } {
+    try {
+      this.client.query(
+        `DELETE FROM ShopOnBoardingSession WHERE shop = ${shop}`
+      );
+
+      return { isSuccess: true };
+    } catch (e) {
+      errorLogger(e);
+      return { isSuccess: false, error: e.message };
+    }
   }
 
   /**

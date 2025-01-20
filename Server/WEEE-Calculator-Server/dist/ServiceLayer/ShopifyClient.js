@@ -10,14 +10,13 @@ const _2023_04_1 = require("@shopify/shopify-api/rest/admin/2023-04");
 dotenv_1.default.config();
 /** This class provides access to the shopify APIs through the shopify client */
 class ShopifyClient {
-    //TODO The accessToken and hostName should be passed as a constructro parameters
     constructor(accessToken, hostName) {
         this.secretKey = process.env.SHOPIFY_API_SECRET_KEY;
         this.accessToken = accessToken;
         this.hostName = hostName;
         this.shopify = (0, shopify_api_1.shopifyApi)({
             apiSecretKey: this.secretKey,
-            apiVersion: shopify_api_1.ApiVersion.January24,
+            apiVersion: shopify_api_1.ApiVersion.January24, //Should be updated when a new API version is released
             isCustomStoreApp: true,
             adminApiAccessToken: this.accessToken,
             isEmbeddedApp: false,
