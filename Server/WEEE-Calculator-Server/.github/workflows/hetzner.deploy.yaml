@@ -1,3 +1,6 @@
+# ! NOTE GITHUB ACTIONS RUNS THE unittest.ts.yaml file. 
+# ! GITHUB ACTIONS DOES NOT RUN THIS SCRIPT
+
 name: Deploy to Hetzner
 
 on:
