@@ -104,7 +104,7 @@ jobs:
           echo "SHOPIFY_API_TOKEN=${{ secrets.SERVER_ENV_SHOPIFY_API_TOKEN }}" >> /srv/weee-calculator-server/.env
           echo "PORT=${{ secrets.SERVER_ENV_PORT }}" >> /srv/weee-calculator-server/.env
           echo "ENVIRONMENT=PRODUCTION" >> /srv/weee-calculator-server/.env
-          echo "PGSQL_USERNAME=${{ secrets.SERVER_PGSQL_USERNAME }}" > /srv/weee-calculator-server/.env
+          echo "PGSQL_USERNAME=${{ secrets.SERVER_PGSQL_USERNAME }}" >> /srv/weee-calculator-server/.env
           echo "PGSQL_PASSWORD=${{ secrets.SERVER_PGSQL_PASSWORD }}" >> /srv/weee-calculator-server/.env
           echo "PGSQL_HOST=${{ secrets.SERVER_PGSQL_HOST }}" >> /srv/weee-calculator-server/.env
           echo "PGSQL_PORT=${{ secrets.SERVER_PGSQL_PORT }}" >> /srv/weee-calculator-server/.env
