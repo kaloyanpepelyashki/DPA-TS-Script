@@ -21,18 +21,17 @@ class PgsqlAccessor {
     }
   }
 
-  public deleteShopRecord(shop: string): {
+  public async deleteShopRecord(shop: string): Promise<{
     isSuccess: boolean;
     error?: string;
-  } {
+  }> {
     try {
-      this.client.query(
+      await this.client.query(
         `DELETE FROM ShopOnBoardingSession WHERE shop = ${shop}`
       );
 
       return { isSuccess: true };
     } catch (e) {
-      errorLogger(e);
       return { isSuccess: false, error: e.message };
     }
   }
