@@ -10,6 +10,7 @@ const webHookRouter = express();
  */
 webHookRouter.post(
   "/shop/redact",
+  express.text({ type: "*/*" }),
   verifyShopifyWebhook,
   async (req: Request, res: Response, next: NextFunction) => {
     const ROUTE = req.baseUrl + req.path;
@@ -26,10 +27,12 @@ webHookRouter.post(
         200
       );
       res.status(200).send("All shop data erased.");
+      return;
     }
 
     routeErrorLogger(ROUTE, req, queryResult.error, 500);
     res.status(500).send("Could not erase shop data. Internal server error.");
+    return;
   }
 );
 
@@ -38,6 +41,7 @@ webHookRouter.post(
  */
 webHookRouter.post(
   "/customer/redact",
+  express.text({ type: "*/*" }),
   verifyShopifyWebhook,
   async (req: Request, res: Response, next: NextFunction) => {
     const ROUTE = req.baseUrl + req.path;
@@ -49,6 +53,7 @@ webHookRouter.post(
       200
     );
     res.status(200).send("No customer data was stored.");
+    return;
   }
 );
 
@@ -57,6 +62,7 @@ webHookRouter.post(
  */
 webHookRouter.post(
   "/customer/data_request",
+  express.text({ type: "*/*" }),
   verifyShopifyWebhook,
   async (req: Request, res: Response, next: NextFunction) => {
     const ROUTE = req.baseUrl + req.path;
@@ -69,6 +75,7 @@ webHookRouter.post(
     );
 
     res.status(200).send("No customer data stored.");
+    return;
   }
 );
 

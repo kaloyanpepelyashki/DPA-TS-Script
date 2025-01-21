@@ -22,15 +22,18 @@ healthRouter.get(
         health.status = "Connected";
 
         res.status(200).send(health);
+        return;
       }
 
       errorLogger(databaseHealthCheck.error);
 
       health.status = "Not connected";
       res.status(500).send(health);
+      return;
     } catch (error: any) {
       errorLogger(error);
       res.status(500).send("Internal server error");
+      return;
     }
   }
 );
@@ -65,6 +68,7 @@ healthRouter.get("/server", async (req: Request, res: Response) => {
       health.message = "Server is healthy";
 
       res.status(200).send(health);
+      return;
     }
 
     health.dependencies.database.status = "Not connected";
@@ -73,6 +77,7 @@ healthRouter.get("/server", async (req: Request, res: Response) => {
     res.status(200).send(health);
   } catch (e) {
     res.status(500).send("Internal server error");
+    return;
   }
 });
 
