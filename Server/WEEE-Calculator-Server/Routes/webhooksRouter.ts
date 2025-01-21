@@ -27,10 +27,12 @@ webHookRouter.post(
         200
       );
       res.status(200).send("All shop data erased.");
+      return;
     }
 
     routeErrorLogger(ROUTE, req, queryResult.error, 500);
     res.status(500).send("Could not erase shop data. Internal server error.");
+    return;
   }
 );
 
@@ -51,6 +53,7 @@ webHookRouter.post(
       200
     );
     res.status(200).send("No customer data was stored.");
+    return;
   }
 );
 
@@ -72,6 +75,7 @@ webHookRouter.post(
     );
 
     res.status(200).send("No customer data stored.");
+    return;
   }
 );
 
