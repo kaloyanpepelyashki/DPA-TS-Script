@@ -109,6 +109,8 @@ jobs:
           echo "PGSQL_HOST=${{ secrets.SERVER_PGSQL_HOST }}" >> /srv/weee-calculator-server/.env
           echo "PGSQL_PORT=${{ secrets.SERVER_PGSQL_PORT }}" >> /srv/weee-calculator-server/.env
           echo "PGSQL_DB_NAME=${{ secrets.SERVER_PGSQL_DB_NAME}}" >> /srv/weee-calculator-server/.env
+          echo "REDIS_PORT=${{ secrets.SERVER_REDIS_PORT }}" >> /srv/weee-calculator-server/.env
+          echo "REDIS_HOST=${{ secrets.SERVER_REDIS_HOST}}" >> /srv/weee-calculator-server/.env
           echo "Contents of .env file:"
           cat /srv/weee-calculator-server/.env
           EOF
