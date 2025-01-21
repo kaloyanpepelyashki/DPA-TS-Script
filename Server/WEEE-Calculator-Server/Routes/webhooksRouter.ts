@@ -10,6 +10,7 @@ const webHookRouter = express();
  */
 webHookRouter.post(
   "/shop/redact",
+  express.text({ type: "*/*" }),
   verifyShopifyWebhook,
   async (req: Request, res: Response, next: NextFunction) => {
     const ROUTE = req.baseUrl + req.path;
@@ -38,6 +39,7 @@ webHookRouter.post(
  */
 webHookRouter.post(
   "/customer/redact",
+  express.text({ type: "*/*" }),
   verifyShopifyWebhook,
   async (req: Request, res: Response, next: NextFunction) => {
     const ROUTE = req.baseUrl + req.path;
@@ -57,6 +59,7 @@ webHookRouter.post(
  */
 webHookRouter.post(
   "/customer/data_request",
+  express.text({ type: "*/*" }),
   verifyShopifyWebhook,
   async (req: Request, res: Response, next: NextFunction) => {
     const ROUTE = req.baseUrl + req.path;
