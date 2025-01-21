@@ -34,6 +34,9 @@ import {
 } from "./Helpers/Logger";
 import healthRouter from "./Routes/HealthRouter";
 
+//Queue Workers
+import { shopRedactWorker } from "./Workers/webhooks_queue_worker";
+
 dotenv.config();
 
 const app = express();
