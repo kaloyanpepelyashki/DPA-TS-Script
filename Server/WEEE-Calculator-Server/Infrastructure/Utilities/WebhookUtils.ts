@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import crypto from "crypto";
-import { routeErrorLogger } from "../Helpers/Logger";
+import { routeErrorLogger } from "../Loggers/Logger";
 
 const SHOPIFY_API_SECRET = process.env.SHOPIFY_API_SECRET;
 

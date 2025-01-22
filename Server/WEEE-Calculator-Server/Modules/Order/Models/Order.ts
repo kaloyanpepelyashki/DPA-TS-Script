@@ -1,4 +1,5 @@
-import OrderProduct from "./OrderProduct";
+import OrderProduct from "../../../Shared Models/OrderProduct";
+
 /** This class represents the order object being fetched from the Shopify API */
 class Order {
   public quantity: number;

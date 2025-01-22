@@ -1,6 +1,6 @@
 import { Client } from "pg";
 import initConnection from "./PGConnection";
-import { errorLogger, generalLog } from "../Helpers/Logger";
+import { errorLogger, generalLog } from "../Loggers/Logger";
 
 class PgsqlAccessor {
   private client: Client;

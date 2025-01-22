@@ -1,4 +1,5 @@
-import Product from "./Product";
+import Product from "../Modules/Product/Models/Product";
+
 /** This class represents the product object being fetched from the Shopify API
  * productId: number - product's id
  *  productTitle: string - product's title

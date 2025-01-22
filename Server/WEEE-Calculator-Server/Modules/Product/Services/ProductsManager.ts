@@ -1,5 +1,5 @@
-import Product from "../../Models/Product";
-import ProductsDAO from "../../DAOs/ProductsDAO";
+import Product from "../Models/Product";
+import ProductsDAO from "../DAOs/ProductsDAO";
 /**
  * This manager class is soley in charge of providing
  *  methods for all actions related to the Product object

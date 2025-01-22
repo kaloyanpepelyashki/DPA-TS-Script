@@ -1,7 +1,6 @@
-import CollectionsDAO from "../../DAOs/CollectionsDAO";
-import CollectionsGraphDAO from "../../DAOs/CollectionsGraphDAO";
-import ResourceNotFound from "../../ExceptionModels/ResourceNotFoundException";
-import CollectionsManager from "./CollectionsManager";
+import CollectionsDAO from "../../Modules/Collection/DAOs/CollectionsDAO";
+import CollectionsGraphDAO from "../../Modules/Collection/DAOs/CollectionsGraphDAO";
+import CollectionsManager from "../../Modules/Collection/Services/CollectionsManager";
 
 class CollectionProductService {
   protected collectionsManager: CollectionsManager;

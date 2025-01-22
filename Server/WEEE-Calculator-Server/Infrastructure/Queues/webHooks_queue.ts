@@ -1,4 +1,4 @@
-import { Queue, RedisConnection } from "bullmq";
+import { Queue } from "bullmq";
 import dotenv from "dotenv";
 
 dotenv.config();

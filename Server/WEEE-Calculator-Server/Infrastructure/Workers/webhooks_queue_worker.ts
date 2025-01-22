@@ -2,7 +2,7 @@ import { Worker } from "bullmq";
 
 import { shopRedactQueue } from "../Queues/webHooks_queue";
 import PgsqlAccessor from "../Database/PgsqlAccessor";
-import { errorLogger, generalLog } from "../Helpers/Logger";
+import { errorLogger, generalLog } from "../Loggers/Logger";
 
 export const shopRedactWorker = new Worker("shop/redact-queue", async (job) => {
   const { route, hostName } = job.data;
