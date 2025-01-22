@@ -1,5 +1,5 @@
 import Order from "../Models/Order";
-import ShopifyClient from "../ServiceLayer/ShopifyClient";
+import ShopifyClient from "../../../Infrastructure/Integrations/ShopifyClient";
 
 class OrdersGraphDAO extends ShopifyClient {
   protected graphQlClient;

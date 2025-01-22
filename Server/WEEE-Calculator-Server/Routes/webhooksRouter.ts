@@ -1,8 +1,11 @@
 import express, { NextFunction, Request, Response } from "express";
-import { verifyShopifyWebhook } from "../Utilities/WebhookUtils";
-import PgsqlAccessor from "../Database/PgsqlAccessor";
-import { routeErrorLogger, routeResponseLogger } from "../Helpers/Logger";
-import { shopRedactQueue } from "../Queues/webHooks_queue";
+import { verifyShopifyWebhook } from "../Infrastructure/Utilities/WebhookUtils";
+import PgsqlAccessor from "../Infrastructure/Database/PgsqlAccessor";
+import {
+  routeErrorLogger,
+  routeResponseLogger,
+} from "../Infrastructure/Loggers/Logger";
+import { shopRedactQueue } from "../Infrastructure/Queues/webHooks_queue";
 
 const webHookRouter = express();
 

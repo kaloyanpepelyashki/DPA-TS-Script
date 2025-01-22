@@ -1,5 +1,4 @@
-import Product from "../Models/Product";
-import ShopifyClient from "../ServiceLayer/ShopifyClient";
+import ShopifyClient from "../../../Infrastructure/Integrations/ShopifyClient";
 
 /** This class is in charge of retreiving products from the shopify database */
 class ProductsDAO extends ShopifyClient {

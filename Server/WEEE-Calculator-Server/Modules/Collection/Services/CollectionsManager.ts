@@ -1,8 +1,9 @@
-import CollectionsGraphDAO from "../../DAOs/CollectionsGraphDAO";
-import CollectionsDAO from "../../DAOs/CollectionsDAO";
-import Collection from "../../Models/Collection";
-import Product from "../../Models/Product";
-import ResourceNotFound from "../../ExceptionModels/ResourceNotFoundException";
+import CollectionsGraphDAO from "../DAOs/CollectionsGraphDAO";
+import CollectionsDAO from "../DAOs/CollectionsDAO";
+import Collection from "../Models/Collection";
+import Product from "../../Product/Models/Product";
+import ResourceNotFound from "../../../ExceptionModels/ResourceNotFoundException";
+
 class CollectionsManager {
   protected collectionsGraphDao: CollectionsGraphDAO;
   protected collectionsRestDao: CollectionsDAO;

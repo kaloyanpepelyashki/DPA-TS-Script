@@ -1,7 +1,6 @@
 import express, { NextFunction, Request, Response } from "express";
-import PgsqlAccessor from "../Database/PgsqlAccessor";
-import { errorLogger, generalLog } from "../Helpers/Logger";
-import { timeStamp } from "console";
+import PgsqlAccessor from "../Infrastructure/Database/PgsqlAccessor";
+import { errorLogger, generalLog } from "../Infrastructure/Loggers/Logger";
 
 const healthRouter = express();
 

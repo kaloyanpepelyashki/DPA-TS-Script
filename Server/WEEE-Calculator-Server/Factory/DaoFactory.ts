@@ -1,8 +1,8 @@
-import ProductsDAO from "../DAOs/ProductsDAO";
-import OrdersDAO from "../DAOs/OrdersDAO";
-import CollectionsDAO from "../DAOs/CollectionsDAO";
-import CollectionsGraphDAO from "../DAOs/CollectionsGraphDAO";
-import OrdersGraphDAO from "../DAOs/OrdersGraphDAO";
+import ProductsDAO from "../Modules/Product/DAOs/ProductsDAO";
+import OrdersDAO from "../Modules/Order/DAOs/OrdersDAO";
+import CollectionsDAO from "../Modules/Collection/DAOs/CollectionsDAO";
+import CollectionsGraphDAO from "../Modules/Collection/DAOs/CollectionsGraphDAO";
+import OrdersGraphDAO from "../Modules/Order/DAOs/OrdersGraphDAO";
 
 /**
  * A factory class for the different Dao modules

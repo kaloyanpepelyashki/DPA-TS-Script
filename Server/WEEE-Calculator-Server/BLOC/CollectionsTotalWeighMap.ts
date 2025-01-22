@@ -1,7 +1,7 @@
 import CollectionsMap from "./CollectionsMap";
 import ProductsSoldMap from "./ProductsSoldMap";
-import CollectionsManager from "../ServiceLayer/Services/CollectionsManager";
-import OrdersManager from "../ServiceLayer/Services/OrdersManager";
+import CollectionsManager from "../Modules/Collection/Services/CollectionsManager";
+import OrdersManager from "../Modules/Order/Services/OrdersManager";
 
 /** This class encapsulates the main logic for calculating the collection's total products sold in weight
  * The class proved a method for calculating the total weight for each collection

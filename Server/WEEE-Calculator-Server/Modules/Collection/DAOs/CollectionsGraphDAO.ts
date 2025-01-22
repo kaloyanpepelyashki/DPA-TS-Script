@@ -1,6 +1,7 @@
-import ResourceNotFound from "../ExceptionModels/ResourceNotFoundException";
+import ResourceNotFound from "../../../ExceptionModels/ResourceNotFoundException";
 import Collection from "../Models/Collection";
-import ShopifyClient from "../ServiceLayer/ShopifyClient";
+import ShopifyClient from "../../../Infrastructure/Integrations/ShopifyClient";
+
 class CollectionsGraphDAO extends ShopifyClient {
   protected graphQlClient;
   public constructor(accessToken: string, hostName: string) {

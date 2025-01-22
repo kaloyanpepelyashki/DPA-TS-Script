@@ -1,6 +1,6 @@
-import Order from "../Models/Order";
-import OrderProduct from "../Models/OrderProduct";
-import OrdersManager from "../ServiceLayer/Services/OrdersManager";
+import Order from "../Modules/Order/Models/Order";
+import OrderProduct from "../Shared Models/OrderProduct";
+import OrdersManager from "../Modules/Order/Services/OrdersManager";
 
 /** This class is a blue print of a Map, that contains both a product Id and the total weight of sold products belonging to it  */
 class ProductsSoldMap {

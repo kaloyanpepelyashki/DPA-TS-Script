@@ -1,4 +1,4 @@
-import ShopifyClient from "../ServiceLayer/ShopifyClient";
+import ShopifyClient from "../../../Infrastructure/Integrations/ShopifyClient";
 
 //TODO Change the structure of the class, so it can take in an accessToken and a host to be passed down to the ShopifyClient class
 /**This data access class is in charge of getting the collections object from the Shopify Database  */

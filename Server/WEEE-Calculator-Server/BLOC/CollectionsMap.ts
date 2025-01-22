@@ -1,6 +1,5 @@
-import CollectionsDAO from "../DAOs/CollectionsDAO";
-import Product from "../Models/Product";
-import CollectionsManager from "../ServiceLayer/Services/CollectionsManager";
+import Product from "../Modules/Product/Models/Product";
+import CollectionsManager from "../Modules/Collection/Services/CollectionsManager";
 
 /** This class is a blue print of a Map, that contains both a collection Id and the products belonging to it */
 class CollectionsMap {

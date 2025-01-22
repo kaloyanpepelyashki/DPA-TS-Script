@@ -1,6 +1,6 @@
-import OrdersDAO from "../../DAOs/OrdersDAO";
-import OrdersGraphDAO from "../../DAOs/OrdersGraphDAO";
-import Order from "../../Models/Order";
+import OrdersDAO from "../DAOs/OrdersDAO";
+import OrdersGraphDAO from "../DAOs/OrdersGraphDAO";
+import Order from "../Models/Order";
 
 //TODO Add the methods from both of the DAOs to the manager
 class OrdersManager {
