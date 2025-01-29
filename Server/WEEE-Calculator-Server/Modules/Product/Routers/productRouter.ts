@@ -1,6 +1,4 @@
 import express, { NextFunction, Request, Response } from "express";
-import cors from "cors";
-import dotenv from "dotenv";
 import RequestUtils from "../../../Infrastructure/Utilities/RequestUtils ";
 import {
   routeErrorLogger,
@@ -23,15 +21,15 @@ const productRouter = express();
  * The route expects headers with string accessToken and string hostName
  * The route sends back an array of product objects
  */
-productRouter.get("/api/v1/products/all", async (req: Request, res) => {
-  const route: string = "/api/v1/products/all";
+productRouter.get("/products/all", async (req: Request, res) => {
+  const ROUTE = req.baseUrl + req.path;
   try {
     console.log("============= \n/products/all  requested by: IP ", req.ip);
 
     const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
     if (!accessToken || !hostName) {
-      routeErrorLogger(route, req, "Missing headers", 400);
+      routeErrorLogger(ROUTE, req, "Missing headers", 400);
 
       res.status(400).send("Missing headers");
       return;
@@ -43,7 +41,7 @@ productRouter.get("/api/v1/products/all", async (req: Request, res) => {
     const result = await productManager.getAllActiveProducts();
 
     if (result.error) {
-      routeErrorLogger(route, req, result.error, 500);
+      routeErrorLogger(ROUTE, req, result.error, 500);
 
       res.status(500).send("Error getting all products. Internal server error");
       return;
@@ -52,7 +50,7 @@ productRouter.get("/api/v1/products/all", async (req: Request, res) => {
     if (result.isSuccess) {
       if (result.products.length == 0) {
         routeResponseLogger(
-          route,
+          ROUTE,
           req,
           `No products were found in vendors store.`,
           404
@@ -62,7 +60,7 @@ productRouter.get("/api/v1/products/all", async (req: Request, res) => {
         return;
       }
       routeResponseLogger(
-        route,
+        ROUTE,
         req,
         "All products retreived successfully",
         200
@@ -71,13 +69,13 @@ productRouter.get("/api/v1/products/all", async (req: Request, res) => {
       res.status(200).send(result.products);
       return;
     } else {
-      routeErrorLogger(route, req, "Internal server error", 500);
+      routeErrorLogger(ROUTE, req, "Internal server error", 500);
 
       res.status(500).send("Error getting all products. Internal server error");
       return;
     }
   } catch (e) {
-    routeErrorLogger(route, req, e, 500);
+    routeErrorLogger(ROUTE, req, e, 500);
 
     res.status(500).send(`Error getting all products. Internal server error`);
     return;
@@ -95,9 +93,9 @@ productRouter.get("/api/v1/products/all", async (req: Request, res) => {
  * products is an array of product ids that will be added to the collection
  */
 productRouter.post(
-  "/api/v1/addProductsToCollection",
+  "/addProductsToCollection",
   async (req: Request, res: Response) => {
-    const route: string = "/addProductsToCollection";
+    const ROUTE = req.baseUrl + req.path;
     try {
       console.log(
         "============= \n/addProductsToCollection  requested by: IP ",
@@ -107,7 +105,7 @@ productRouter.post(
       const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
       if (!accessToken || !hostName) {
-        routeErrorLogger(route, req, "Missing headers", 400);
+        routeErrorLogger(ROUTE, req, "Missing headers", 400);
 
         res.status(400).send({ message: "Missing headers" });
         return;
@@ -117,7 +115,7 @@ productRouter.post(
       const products: Array<string> = req.body.products;
 
       if (typeof collectionId !== "string" || !Array.isArray(products)) {
-        routeErrorLogger(route, req, "Parameters of wrong type", 400);
+        routeErrorLogger(ROUTE, req, "Parameters of wrong type", 400);
 
         res.status(400).send({ message: "Prameters are not of correct type" });
         return;
@@ -138,7 +136,7 @@ productRouter.post(
       );
 
       if (result.error) {
-        routeErrorLogger(route, req, result.error, 500);
+        routeErrorLogger(ROUTE, req, result.error, 500);
 
         res
           .status(500)
@@ -147,14 +145,14 @@ productRouter.post(
       }
 
       if (result.isSuccess) {
-        routeResponseLogger(route, req, "Products added successfully", 200);
+        routeResponseLogger(ROUTE, req, "Products added successfully", 200);
 
         res
           .status(200)
           .send({ message: "Products successfully added to collecton" });
         return;
       } else {
-        routeErrorLogger(route, req, "Internal server error", 500);
+        routeErrorLogger(ROUTE, req, "Internal server error", 500);
 
         res
           .status(500)
@@ -163,12 +161,12 @@ productRouter.post(
       }
     } catch (err) {
       if (err instanceof ResourceNotFound) {
-        routeErrorLogger(route, req, err, 400);
+        routeErrorLogger(ROUTE, req, err, 400);
 
         res.status(400).send(err);
         return;
       } else {
-        routeErrorLogger(route, req, err, 500);
+        routeErrorLogger(ROUTE, req, err, 500);
 
         res
           .status(500)
@@ -190,9 +188,9 @@ productRouter.post(
  * products is an array of product ids that will be removed from the collection
  */
 productRouter.post(
-  "/api/v1/removeProductsFromCollection",
+  "/removeProductsFromCollection",
   async (req: Request, res: Response) => {
-    const route: string = "/removeProductsFromCollection";
+    const ROUTE = req.baseUrl + req.path;
     try {
       console.log(
         "============= \n/removeProductsFromCollection  requested by: IP ",
@@ -202,7 +200,7 @@ productRouter.post(
       const { accessToken, hostName } = RequestUtils.extractHeaders(req);
 
       if (!accessToken || !hostName) {
-        routeErrorLogger(route, req, "Missing headers", 500);
+        routeErrorLogger(ROUTE, req, "Missing headers", 500);
 
         res.status(400).send("Missing headers");
         return;
@@ -212,7 +210,7 @@ productRouter.post(
       const products = req.body.products;
 
       if (typeof collectionId !== "string" || !Array.isArray(products)) {
-        routeErrorLogger(route, req, "Parameters of wrong type", 500);
+        routeErrorLogger(ROUTE, req, "Parameters of wrong type", 500);
 
         res.status(400).send("Prameters are not of correct type");
         return;
@@ -234,20 +232,20 @@ productRouter.post(
         );
 
       if (result.error) {
-        routeErrorLogger(route, req, result.error, 500);
+        routeErrorLogger(ROUTE, req, result.error, 500);
 
         res.status(500).send("Error removing products. Internal server error");
         return;
       }
       if (result.isSuccess) {
-        routeResponseLogger(route, req, "Products removed successfully", 200);
+        routeResponseLogger(ROUTE, req, "Products removed successfully", 200);
 
         res
           .status(200)
           .send({ message: "Products successfully removed from collecton" });
         return;
       } else {
-        routeErrorLogger(route, req, "Internal server error", 500);
+        routeErrorLogger(ROUTE, req, "Internal server error", 500);
 
         res
           .status(500)
@@ -259,7 +257,7 @@ productRouter.post(
         res.status(400).send(err);
         return;
       } else {
-        routeErrorLogger(route, req, err, 500);
+        routeErrorLogger(ROUTE, req, err, 500);
 
         res
           .status(500)
