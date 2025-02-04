@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import "@shopify/shopify-api/adapters/node";
 import { shopifyApi, ApiVersion, Session, Shopify } from "@shopify/shopify-api";
-import { restResources } from "@shopify/shopify-api/rest/admin/2023-04";
+import { restResources } from "@shopify/shopify-api/rest/admin/2024-01";
 dotenv.config();
 /** This class provides access to the shopify APIs through the shopify client */
 class ShopifyClient {

@@ -174,7 +174,6 @@ class CollectionsGraphDAO extends ShopifyClient {
   ): Promise<{ isSuccess: boolean }> {
     try {
       let productsArray: Array<string> = [];
-
       //Note the id's need to be pushed to an array, and afterwards the array is being pushed to the object being sent to the Shopify db
       products.forEach((product) => {
         productsArray.push(`gid://shopify/Product/${product}`);
@@ -186,7 +185,6 @@ class CollectionsGraphDAO extends ShopifyClient {
             collection {
               id
               title
-              productsCount
               products(first: 10) {
                 nodes {
                   id
@@ -214,7 +212,7 @@ class CollectionsGraphDAO extends ShopifyClient {
           result.data.collectionAddProducts.userErrors[0]
         );
         throw new Error(
-          `Error adding products to collection: ${result.data.collectionAddProducts.userErrors[0]}`
+          `Error in addProductsToCollections. Error adding products to collection: ${result.data.collectionAddProducts.userErrors[0]}`
         );
       } else {
         return { isSuccess: true };
